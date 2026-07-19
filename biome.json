@@ -1,0 +1,36 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.4/schema.json",
+	"files": {
+		"includes": [
+			"**",
+			"!dist",
+			"!coverage",
+			"!playwright-report",
+			"!test-results",
+			"!.wrangler",
+			"!node_modules"
+		]
+	},
+	"formatter": {
+		"enabled": false
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended",
+			"correctness": {
+				"noUnusedImports": "error",
+				"noUnusedVariables": "error"
+			},
+			"suspicious": {
+				"noExplicitAny": "off"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"semicolons": "always"
+		}
+	}
+}

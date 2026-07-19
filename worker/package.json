@@ -1,0 +1,21 @@
+{
+  "name": "@ai-signal/worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --config wrangler.dev.jsonc",
+    "dev:scheduled": "wrangler dev --config wrangler.dev.jsonc --test-scheduled",
+    "typecheck": "tsc -p tsconfig.json --noEmit --pretty false",
+    "deploy": "wrangler deploy --config wrangler.jsonc"
+  },
+  "dependencies": {
+    "fast-xml-parser": "5.10.1",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260719.1",
+    "typescript": "7.0.2",
+    "wrangler": "4.112.0"
+  }
+}

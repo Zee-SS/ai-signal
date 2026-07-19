@@ -1,0 +1,26 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "ai-signal-ingestion",
+  "main": "src/index.ts",
+  "workers_dev": true,
+  "compatibility_date": "2026-07-19",
+  "compatibility_flags": ["nodejs_compat"],
+  "triggers": {
+    "crons": ["0 */3 * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "AI_SIGNAL_DB",
+      "database_name": "ai-signal-prod",
+      "database_id": "141ab606-f857-4080-9f76-ea758b51ede1",
+      "migrations_dir": "../migrations"
+    }
+  ],
+  "vars": {
+    "INCLUDE_PRERELEASES": "false",
+    "ENVIRONMENT": "production"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

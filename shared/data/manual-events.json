@@ -1,0 +1,15 @@
+[
+  {
+    "id": "event_neurips_2026_main",
+    "title": "NeurIPS 2026 main conference",
+    "description": "The fortieth annual Conference on Neural Information Processing Systems in Sydney, Australia.",
+    "category": "conference",
+    "provider": "NeurIPS",
+    "startsAt": "2026-12-06T00:00:00.000Z",
+    "endsAt": "2026-12-13T00:00:00.000Z",
+    "allDay": true,
+    "sourceUrl": "https://nips.cc/",
+    "verifiedAt": "2026-07-19T14:30:00.000Z",
+    "status": "confirmed"
+  }
+]

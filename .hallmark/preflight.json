@@ -1,0 +1,10 @@
+{
+  "date": "2026-07-19",
+  "framework": "React 19 with Vite 8",
+  "font": "Geist Variable and Geist Mono Variable",
+  "palette": "Custom OKLCH tokens in tokens.css",
+  "motion": "Native CSS transitions, IntersectionObserver, reduced-motion support",
+  "spacing": "4pt semantic scale",
+  "preserved": [],
+  "introduced": ["Ecosystem Index structure", "N10-derived compact rail", "Ft4 dense colophon"]
+}

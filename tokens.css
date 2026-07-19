@@ -1,0 +1,81 @@
+:root {
+  color-scheme: light;
+
+  --font-body: "Geist Variable", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", "SFMono-Regular", Consolas, monospace;
+
+  --color-paper: oklch(0.991 0.002 110);
+  --color-paper-2: oklch(0.981 0.003 110);
+  --color-paper-3: oklch(0.965 0.005 110);
+  --color-surface: oklch(1 0 0);
+  --color-surface-raised: oklch(0.998 0.001 110);
+  --color-ink: oklch(0.185 0.012 110);
+  --color-ink-2: oklch(0.31 0.014 110);
+  --color-muted: oklch(0.48 0.012 110);
+  --color-rule: oklch(0.87 0.008 110);
+  --color-rule-2: oklch(0.78 0.012 110);
+
+  --color-primary: oklch(0.35 0.075 110);
+  --color-primary-hover: oklch(0.29 0.072 110);
+  --color-primary-ink: oklch(0.985 0.005 110);
+  --color-focus: oklch(0.52 0.13 110);
+  --color-focus-soft: oklch(0.91 0.06 110 / 0.7);
+
+  --color-model: oklch(0.5 0.17 292);
+  --color-model-tint: oklch(0.955 0.027 292);
+  --color-tool: oklch(0.51 0.14 251);
+  --color-tool-tint: oklch(0.958 0.023 251);
+  --color-benchmark: oklch(0.53 0.12 75);
+  --color-benchmark-tint: oklch(0.963 0.035 82);
+  --color-research: oklch(0.46 0.105 153);
+  --color-research-tint: oklch(0.956 0.027 153);
+  --color-event: oklch(0.55 0.16 28);
+  --color-event-tint: oklch(0.958 0.029 28);
+  --color-community: oklch(0.5 0.1 210);
+  --color-community-tint: oklch(0.958 0.025 210);
+
+  --color-success: oklch(0.44 0.1 150);
+  --color-warning: oklch(0.54 0.12 73);
+  --color-warning-tint: oklch(0.965 0.042 83);
+  --color-error: oklch(0.52 0.18 27);
+  --color-error-tint: oklch(0.958 0.032 27);
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: clamp(1.35rem, 1.15rem + 0.45vw, 1.6rem);
+  --text-2xl: clamp(1.75rem, 1.45rem + 0.8vw, 2.15rem);
+
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.375rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4.5rem;
+  --space-4xl: 6rem;
+
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+
+  --shadow-whisper: 0 1px 2px oklch(0.18 0.01 110 / 0.06), 0 8px 24px oklch(0.18 0.01 110 / 0.04);
+  --shadow-dialog: 0 24px 80px oklch(0.16 0.02 110 / 0.18), 0 2px 8px oklch(0.16 0.02 110 / 0.08);
+
+  --content-max: 96rem;
+  --page-gutter: clamp(1rem, 2.6vw, 2.5rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-press: 80ms;
+  --dur-micro: 120ms;
+  --dur-short: 180ms;
+  --dur-dialog: 220ms;
+
+  --z-sticky: 20;
+  --z-tooltip: 40;
+  --z-modal: 50;
+}

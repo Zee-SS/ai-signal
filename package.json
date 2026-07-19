@@ -1,0 +1,59 @@
+{
+  "name": "ai-signal",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "worker"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "dev:pages": "npm run build && wrangler pages dev dist --config wrangler.dev.jsonc",
+    "dev:worker": "npm run dev --workspace @ai-signal/worker",
+    "build": "npm run typecheck && vite build",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit --pretty false && npm run typecheck --workspace @ai-signal/worker",
+    "lint": "biome check --diagnostic-level=error .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:all": "npm run lint && npm run typecheck && npm run test && npm run build && npm run test:e2e",
+    "db:migrate:local": "wrangler d1 migrations apply AI_SIGNAL_DB --local --config wrangler.dev.jsonc",
+    "db:migrate:dev": "wrangler d1 migrations apply AI_SIGNAL_DB --remote --config wrangler.dev.jsonc",
+    "db:migrate:remote": "wrangler d1 migrations apply ai-signal-prod --remote",
+    "ingest:local": "npm run dev:scheduled --workspace @ai-signal/worker",
+    "deploy:pages": "npm run build && wrangler pages deploy dist --project-name ai-signal",
+    "deploy:worker": "npm run deploy --workspace @ai-signal/worker"
+  },
+  "dependencies": {
+    "@fontsource-variable/geist": "5.3.0",
+    "@fontsource-variable/geist-mono": "5.3.0",
+    "@phosphor-icons/react": "2.1.10",
+    "@radix-ui/react-dialog": "1.1.19",
+    "@radix-ui/react-popover": "1.1.19",
+    "fast-xml-parser": "5.10.1",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.4",
+    "@axe-core/playwright": "4.12.1",
+    "@cloudflare/workers-types": "5.20260719.1",
+    "@playwright/test": "1.61.1",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "26.1.1",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "@vitest/coverage-v8": "4.1.10",
+    "tailwindcss": "4.3.3",
+    "typescript": "7.0.2",
+    "vite": "8.1.5",
+    "vitest": "4.1.10",
+    "wrangler": "4.112.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

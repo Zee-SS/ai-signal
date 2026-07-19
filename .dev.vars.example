@@ -1,0 +1,10 @@
+# Required only for the protected manual ingestion endpoint.
+SYNC_SECRET=generate-a-long-random-value
+
+# Optional. Unauthenticated requests still work at lower rate limits.
+GITHUB_TOKEN=
+OPENROUTER_API_KEY=
+HUGGINGFACE_TOKEN=
+
+# Public build-time metadata, not a secret. Omit until the repository is published.
+VITE_REPOSITORY_URL=

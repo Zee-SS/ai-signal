@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ai-signal-pages",
+  "compatibility_date": "2026-07-19",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": "./dist",
+  "d1_databases": [
+    {
+      "binding": "AI_SIGNAL_DB",
+      "database_name": "ai-signal-prod",
+      "database_id": "141ab606-f857-4080-9f76-ea758b51ede1",
+      "migrations_dir": "./migrations"
+    }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production"
+  }
+}
