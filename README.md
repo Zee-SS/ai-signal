@@ -66,7 +66,7 @@ public/              Security headers, manifest, icons, robots metadata
 9. Source health and the overall sync summary are recorded. Items older than 180 days are pruned and expired confirmed events are archived.
 10. Pages Functions serve D1 data with `max-age=180`, `stale-while-revalidate=10800`, and `stale-if-error=86400`. If D1 fails, the last verified edge response is returned with explicit stale headers and UI copy.
 
-The browser also stores the last valid dashboard response. Production never imports the development fixture. The fixture is loaded only by Vite development when no API or browser cache is available and is visibly labelled.
+The browser also stores the last valid dashboard response. A small service worker caches the application shell, fonts, and static assets for resilient repeat visits; API failures still reach the app so cached dashboard data is explicitly marked stale. Production never imports the development fixture. The fixture is loaded only by Vite development when no API or browser cache is available and is visibly labelled.
 
 ## Source adapters
 
@@ -76,7 +76,7 @@ Enabled adapters:
 
 | Purpose | Sources | Adapter |
 | --- | --- | --- |
-| Provider announcements | OpenAI News, Google DeepMind, Google for Developers, GitHub Copilot, Hugging Face Blog | RSS |
+| Provider announcements | OpenAI News, Google DeepMind, Google for Developers, GitHub Copilot, Hugging Face Blog | RSS; Google entries use matching dates from the official sitemap |
 | Coding-agent releases | `openai/codex`, `anthropics/claude-code`, `google-gemini/gemini-cli`, `Aider-AI/aider` | GitHub Releases API |
 | Model metadata | OpenRouter Models API | JSON API, explicitly secondary evidence |
 | Open-model interest | Hugging Face Hub API | JSON API; downloads/likes labelled as interest, not quality |
@@ -85,7 +85,7 @@ Enabled adapters:
 | Important dates | `shared/data/manual-events.json` | Zod-validated curated JSON |
 | Benchmarks | `shared/data/benchmark-snapshots.json` | Zod-validated curated JSON |
 
-HTML metadata extraction exists as an isolated last-resort adapter, but sources without a stable verified feed are disabled by default. Anthropic News, Meta AI, Mistral AI, Microsoft AI, Qwen, and DeepSeek remain visible in configuration with the reason they are disabled. Google for Developers is currently reported as degraded because its RSS items omit a per-item date; AI Signal does not substitute the feed build date as an article date.
+HTML metadata extraction exists as an isolated last-resort adapter, but sources without a stable verified feed are disabled by default. Anthropic News, Meta AI, Mistral AI, Microsoft AI, Qwen, and DeepSeek remain visible in configuration with the reason they are disabled. Google for Developers omits per-item RSS dates, so its adapter joins each official feed URL to the matching `lastmod` value in Google’s official sitemap. It never substitutes the feed-wide build date.
 
 Nightly, draft, and prerelease GitHub releases are ignored unless `INCLUDE_PRERELEASES=true` is set on the Worker.
 
@@ -161,7 +161,7 @@ Copy `.dev.vars.example` to `.dev.vars`. Never commit `.dev.vars`.
 | `OPENROUTER_API_KEY` | No | Worker secret | Optional authenticated OpenRouter access |
 | `HUGGINGFACE_TOKEN` | No | Worker secret | Optional authenticated Hugging Face access |
 | `INCLUDE_PRERELEASES` | No | Worker variable | Defaults to `false` |
-| `VITE_REPOSITORY_URL` | No | Pages build variable | Enables repository links after a public repository exists |
+| `VITE_REPOSITORY_URL` | No | Pages build variable | Overrides the default public repository link for forks or renamed repositories |
 
 The public browser bundle never receives API tokens. Unauthenticated source requests still work, subject to lower provider rate limits.
 
@@ -196,6 +196,7 @@ npx wrangler secret put HUGGINGFACE_TOKEN --config worker/wrangler.jsonc
 | `npm run db:migrate:dev` | Apply migrations to remote development D1 |
 | `npm run db:migrate:remote` | Apply migrations to remote production D1 |
 | `npm run ingest:local` | Start local Worker with scheduled-event endpoint |
+| `npm run benchmarks:update` | Refresh official SWE-bench and Aider snapshots while preserving manual records |
 | `npm run deploy:worker` | Deploy Worker and cron trigger |
 | `npm run deploy:pages` | Build and deploy Pages assets/functions |
 
@@ -365,6 +366,8 @@ Drafts are always ignored; prereleases follow `INCLUDE_PRERELEASES`.
 
 Append a record to `shared/data/benchmark-snapshots.json` matching `benchmarkResultSchema`. Required fields include benchmark slug, exact track, model, score/unit, evaluation date, snapshot date, source URL, optional agent/scaffold, notes, and `importMethod` (`automatic` or `manual`). Use only an official machine-readable source, official repository, or explicitly dated curated snapshot. Never mix tracks.
 
+`npm run benchmarks:update` retrieves the top three current records for SWE-bench Verified, SWE-bench Multilingual, and Aider Polyglot directly from their official repositories, records the source commit in each note, and preserves manually verified records such as the dated SWE-rebench snapshot. The script writes only after every official source succeeds.
+
 ### Add an important date
 
 Append a record to `shared/data/manual-events.json` matching `eventSchema`: exact start/end, category, provider, official source URL, verification timestamp, all-day flag, and confirmed status. Date ranges use an exclusive all-day `endsAt` for correct ICS output. Rumoured releases do not belong here.
@@ -388,6 +391,7 @@ Append a record to `shared/data/manual-events.json` matching `eventSchema`: exac
 - Model tables become labelled stacked records at narrow widths without horizontal scrolling
 - No account, analytics, tracking, or personal-data collection
 - Bookmarks, unread state, filters, last visit, and one verified dashboard cache remain only in browser `localStorage`
+- A same-origin service worker caches the application shell and static assets while `localStorage` retains the last dashboard; an explicit offline notice appears when connectivity is lost
 - CSP, frame denial, MIME sniffing protection, referrer policy, permissions policy, and safe external-link attributes are included in `public/_headers`
 
 ## Cloudflare free-tier considerations
@@ -403,13 +407,12 @@ Append a record to `shared/data/manual-events.json` matching `eventSchema`: exac
 ## Known limitations
 
 - Several provider news sites do not publish a verified stable feed. Their disabled adapters are preserved in configuration with reasons instead of using brittle scraping.
-- Google for Developers currently omits per-item dates from its RSS response, so it reports a source error until that can be verified from a stable machine-readable field.
 - OpenRouter metadata is secondary evidence. It does not establish an official announcement, and open-weight status is shown as unverified unless another source confirms it.
 - Hugging Face download and like counts are community-interest signals, not model-quality measures.
 - Hacker News sampling is a trend input, not exhaustive coverage or technical verification.
-- Curated benchmark result files start empty rather than shipping stale or cross-track scores. Benchmark definitions and official leaderboard links remain visible until verified snapshots are added.
-- The repository controls are intentionally disabled until `VITE_REPOSITORY_URL` points to a real public repository.
-- The browser cache is resilience support, not a full offline-first service worker.
+- SWE-bench Pro, LiveCodeBench, and Arena cards remain source-only until their official leaderboard exports include enough dated, track-specific metadata for an honest snapshot. Dynamic HTML is not treated as a stable API.
+- Optional provider tokens are not required; without narrowly scoped tokens, GitHub, Hugging Face, and OpenRouter use their lower anonymous rate limits.
+- Offline mode supports repeat visits and cached reading, but external source links naturally require connectivity.
 
 ## Attribution and content policy
 
@@ -424,5 +427,6 @@ AI Signal stores titles, original URLs, dates, provider/author metadata, source-
 - Cron: `0 */3 * * *`
 - D1: separate `ai-signal-dev` and `ai-signal-prod` databases in WEUR
 - Analytics: disabled
+- Public repository: <https://github.com/Zee-SS/ai-signal>
 
-The initial production sync completed as a partial success: 14 of 15 enabled sources succeeded. The only failure was the undated Google Developers RSS format described above; all other source results were retained and served.
+The Google Developers feed-date repair, verified benchmark snapshots, and offline service worker are included in the current release. Source-health details remain visible in the live dashboard after every scheduled run.

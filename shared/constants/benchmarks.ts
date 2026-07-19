@@ -22,7 +22,7 @@ export const BENCHMARK_DEFINITIONS: Array<Omit<BenchmarkDefinition, "results" | 
     slug: "swe-bench-pro",
     name: "SWE-bench Pro",
     description: "Tracks harder professional software-engineering tasks when public verified results are available.",
-    leaderboardUrl: "https://www.swebench.com/",
+    leaderboardUrl: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
     sourceKind: "curated-snapshot",
   },
   {
@@ -37,13 +37,13 @@ export const BENCHMARK_DEFINITIONS: Array<Omit<BenchmarkDefinition, "results" | 
     name: "Aider Polyglot",
     description: "Tests editing performance on coding exercises across several programming languages.",
     leaderboardUrl: "https://aider.chat/docs/leaderboards/",
-    sourceKind: "curated-snapshot",
+    sourceKind: "official-repository",
   },
   {
     slug: "arena-coding",
     name: "Arena coding category",
     description: "Uses pairwise human preferences for coding-focused model responses in the Arena setup.",
-    leaderboardUrl: "https://lmarena.ai/leaderboard",
+    leaderboardUrl: "https://arena.ai/leaderboard",
     sourceKind: "curated-snapshot",
   },
   {

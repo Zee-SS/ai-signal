@@ -102,3 +102,11 @@ test("reduced-motion mode collapses interaction transitions", async ({ page }) =
   const duration = await page.getByRole("button", { name: "Filters" }).evaluate((element) => getComputedStyle(element).transitionDuration);
   expect(duration).toMatch(/0\.001s|1ms/);
 });
+
+test("going offline keeps the loaded dashboard usable and explains the state", async ({ page, context }) => {
+  await context.setOffline(true);
+  await expect(page.getByText("Offline mode", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Showing the verified dashboard saved on this device/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Today’s signal" })).toBeVisible();
+  await context.setOffline(false);
+});

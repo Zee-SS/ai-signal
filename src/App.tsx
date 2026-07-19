@@ -18,6 +18,7 @@ import { SinceLastVisit } from "@/features/dashboard/SinceLastVisit";
 import { TodaySignal } from "@/features/dashboard/TodaySignal";
 import { TrendRadar } from "@/features/dashboard/TrendRadar";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { type DashboardFilters, DEFAULT_FILTERS, filterItems, globalSearch } from "@/lib/filters";
 import { readStorage, STORAGE_KEYS, writeStorage } from "@/lib/storage";
 
@@ -35,6 +36,7 @@ const CATEGORIES = [
 
 export default function App() {
   const { data, state, error, reload } = useDashboardData();
+  const online = useOnlineStatus();
   const [filters, setFilters] = useState<DashboardFilters>(() => ({
     ...DEFAULT_FILTERS,
     ...readStorage<Partial<DashboardFilters>>(STORAGE_KEYS.filters, {}),
@@ -165,12 +167,14 @@ export default function App() {
         refreshing={state === "loading"}
       />
       <main id="main-content" className="page-shell">
-        {(data.meta.fixture || data.meta.isStale || partialFailures.length > 0) && (
+        {(!online || data.meta.fixture || data.meta.isStale || partialFailures.length > 0) && (
           <div className="data-warning" role="status" data-fixture={data.meta.fixture ? "true" : "false"}>
             <WarningCircle aria-hidden="true" weight="fill" />
             <div>
-              <strong>{data.meta.fixture ? "Development fixture" : data.meta.isStale ? "Data may be stale" : "Source coverage is partial"}</strong>
-              <span>{data.meta.staleReason ?? `${partialFailures.length} source${partialFailures.length === 1 ? " could" : "s could"} not be verified in the latest refresh. Other sources remain current.`}</span>
+              <strong>{!online ? "Offline mode" : data.meta.fixture ? "Development fixture" : data.meta.isStale ? "Data may be stale" : "Source coverage is partial"}</strong>
+              <span>{!online
+                ? "Showing the verified dashboard saved on this device. Source links will open when your connection returns."
+                : data.meta.staleReason ?? `${partialFailures.length} source${partialFailures.length === 1 ? " could" : "s could"} not be verified in the latest refresh. Other sources remain current.`}</span>
             </div>
           </div>
         )}

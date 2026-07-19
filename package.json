@@ -22,6 +22,7 @@
     "db:migrate:dev": "wrangler d1 migrations apply AI_SIGNAL_DB --remote --config wrangler.dev.jsonc",
     "db:migrate:remote": "wrangler d1 migrations apply ai-signal-prod --remote",
     "ingest:local": "npm run dev:scheduled --workspace @ai-signal/worker",
+    "benchmarks:update": "node scripts/update-benchmark-snapshots.mjs",
     "deploy:pages": "npm run build && wrangler pages deploy dist --project-name ai-signal",
     "deploy:worker": "npm run deploy --workspace @ai-signal/worker"
   },

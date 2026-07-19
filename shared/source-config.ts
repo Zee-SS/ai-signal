@@ -7,6 +7,7 @@ interface AdapterBase {
 export interface FeedAdapterConfig extends AdapterBase {
   type: "rss" | "atom";
   url: string;
+  dateSitemapUrl?: string;
   itemType: ItemType;
   provider: string | null;
   tags: string[];
@@ -111,6 +112,7 @@ export const SOURCE_CONFIG: SourceDefinition[] = [
     adapter: {
       type: "rss",
       url: "https://developers.googleblog.com/feeds/posts/default/",
+      dateSitemapUrl: "https://developers.googleblog.com/sitemap.xml",
       itemType: "announcement",
       provider: "Google",
       tags: ["developer-tools", "provider-announcement"],

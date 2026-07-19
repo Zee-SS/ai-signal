@@ -1,5 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import { containsAny, stripMarkup, truncate } from "../../../shared/lib/text";
+import { canonicalizeUrl } from "../../../shared/lib/url";
 import { type ExternalItem, externalItemSchema, type ItemType } from "../../../shared/schemas/domain";
 import type { FeedAdapterConfig } from "../../../shared/source-config";
 import { fetchWithPolicy } from "./fetcher";
@@ -77,6 +78,7 @@ export function parseFeedXml(
   config: FeedAdapterConfig,
   sourceSlug: string,
   fetchedAt: string,
+  sitemapDates: ReadonlyMap<string, string> = new Map(),
 ): ExternalItem[] {
   let document: Record<string, unknown>;
   try {
@@ -95,7 +97,9 @@ export function parseFeedXml(
     const title = stripMarkup(textValue(entry.title));
     const summary = truncate(textValue(entry.description ?? entry.summary ?? entry.content), 420);
     const url = linkValue(entry.link) || textValue(entry.guid ?? entry.id);
-    const publishedAt = validIsoDate(entry.pubDate ?? entry.published ?? entry.updated);
+    const feedDate = validIsoDate(entry.pubDate ?? entry.published ?? entry.updated);
+    const sitemapDate = url ? sitemapDates.get(canonicalizeUrl(url)) ?? null : null;
+    const publishedAt = feedDate ?? sitemapDate;
     const author = stripMarkup(textValue(entry.author ?? entry.creator ?? entry["dc:creator"]));
     if (!title || !url || !publishedAt) continue;
 
@@ -112,7 +116,10 @@ export function parseFeedXml(
       tags: config.tags,
       externalScore: null,
       externalComments: null,
-      metadata: { feedKind: config.type },
+      metadata: {
+        feedKind: config.type,
+        dateSource: feedDate ? "feed" : "official-sitemap-lastmod",
+      },
     });
     if (candidate.success) parsed.push(candidate.data);
   }
@@ -121,13 +128,43 @@ export function parseFeedXml(
   return parsed;
 }
 
+export function parseSitemapDates(xml: string): Map<string, string> {
+  let document: Record<string, unknown>;
+  try {
+    document = parser.parse(xml) as Record<string, unknown>;
+  } catch (error) {
+    throw new Error(`Malformed sitemap XML: ${error instanceof Error ? error.message : "parse failure"}`);
+  }
+
+  const urlset = document.urlset as {
+    url?: Array<{ loc?: unknown; lastmod?: unknown }> | { loc?: unknown; lastmod?: unknown };
+  } | undefined;
+  const dates = new Map<string, string>();
+  for (const entry of asArray(urlset?.url)) {
+    const url = textValue(entry.loc);
+    const lastModified = validIsoDate(entry.lastmod);
+    if (url && lastModified) dates.set(canonicalizeUrl(url), lastModified);
+  }
+  if (!dates.size) throw new Error("Official sitemap contained no verifiable URL dates");
+  return dates;
+}
+
 export async function feedAdapter(context: AdapterContext): Promise<AdapterResult> {
   const config = context.source.adapter;
   if (config.type !== "rss" && config.type !== "atom") throw new Error("Feed adapter received incompatible configuration");
-  const response = await fetchWithPolicy(config.url, {}, { timeoutMs: 12_000, retries: 2 });
-  const xml = await response.text();
+  const [response, sitemapResponse] = await Promise.all([
+    fetchWithPolicy(config.url, {}, { timeoutMs: 12_000, retries: 2 }),
+    config.dateSitemapUrl
+      ? fetchWithPolicy(config.dateSitemapUrl, {}, { timeoutMs: 12_000, retries: 2 })
+      : Promise.resolve(null),
+  ]);
+  const [xml, sitemapXml] = await Promise.all([
+    response.text(),
+    sitemapResponse ? sitemapResponse.text() : Promise.resolve(null),
+  ]);
+  const sitemapDates = sitemapXml ? parseSitemapDates(sitemapXml) : new Map<string, string>();
   return {
     ...emptyAdapterResult(),
-    items: parseFeedXml(xml, config, context.source.slug, context.fetchedAt),
+    items: parseFeedXml(xml, config, context.source.slug, context.fetchedAt, sitemapDates),
   };
 }

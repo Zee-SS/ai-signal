@@ -3,6 +3,8 @@
   "short_name": "AI Signal",
   "description": "A source-backed daily view of AI models, coding agents, benchmarks, and research.",
   "start_url": "/",
+  "scope": "/",
+  "id": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",

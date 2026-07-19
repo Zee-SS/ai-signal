@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { FeedAdapterConfig } from "../../shared/source-config";
-import { parseFeedXml } from "../../worker/src/adapters/feed";
+import { parseFeedXml, parseSitemapDates } from "../../worker/src/adapters/feed";
 
 const config: FeedAdapterConfig = {
   type: "rss",
@@ -45,5 +45,15 @@ describe("parseFeedXml", () => {
   it("rejects malformed or empty feeds", () => {
     expect(() => parseFeedXml("<rss><broken>", config, "provider-news", "2026-07-19T09:00:00.000Z"))
       .toThrow(/Malformed XML|no RSS items/i);
+  });
+
+  it("uses matching official sitemap update dates when RSS entries omit dates", () => {
+    const feed = `<?xml version="1.0"?><rss><channel><item><title>Developer update</title><link>https://developers.example/update/</link><description>Verified excerpt</description></item></channel></rss>`;
+    const sitemap = `<?xml version="1.0"?><urlset><url><loc>https://developers.example/update/</loc><lastmod>2026-07-16</lastmod></url></urlset>`;
+    const dates = parseSitemapDates(sitemap);
+    const [item] = parseFeedXml(feed, config, "developer-news", "2026-07-19T12:00:00.000Z", dates);
+
+    expect(item?.publishedAt).toBe("2026-07-16T00:00:00.000Z");
+    expect(item?.metadata.dateSource).toBe("official-sitemap-lastmod");
   });
 });

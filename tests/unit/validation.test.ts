@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { externalItemSchema, modelSchema } from "../../shared/schemas/domain";
+import benchmarkSnapshots from "../../shared/data/benchmark-snapshots.json";
+import { benchmarkResultSchema, externalItemSchema, modelSchema } from "../../shared/schemas/domain";
 
 describe("external schemas", () => {
   it("accepts a minimal verified item", () => {
@@ -46,5 +47,17 @@ describe("external schemas", () => {
       lastVerifiedAt: "2026-07-19T08:00:00.000Z",
     });
     expect(result.success).toBe(false);
+  });
+
+  it("validates every maintained benchmark snapshot and keeps IDs unique", () => {
+    const parsed = benchmarkResultSchema.array().parse(benchmarkSnapshots);
+    expect(parsed).toHaveLength(12);
+    expect(new Set(parsed.map((entry) => entry.id)).size).toBe(parsed.length);
+    expect(new Set(parsed.map((entry) => entry.benchmarkSlug))).toEqual(new Set([
+      "aider-polyglot",
+      "swe-bench-multilingual",
+      "swe-bench-verified",
+      "swe-rebench",
+    ]));
   });
 });
