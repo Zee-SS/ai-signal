@@ -907,7 +907,7 @@ svg {
 }
 
 .external-link.external-link--block {
-  transition: color var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out), transform 280ms var(--ease-nav);
+  transition: color var(--dur-block-hover) var(--ease-hover), background-color var(--dur-block-hover) var(--ease-hover), transform var(--dur-block-hover) var(--ease-hover);
 }
 
 .model-detail__sources {
@@ -1121,7 +1121,7 @@ svg {
 
 .reveal[data-visible="true"] .agent-row,
 .reveal[data-visible="true"] .skill-bar {
-  animation: item-pop var(--dur-reveal) var(--ease-reveal) both;
+  animation: item-pop var(--dur-reveal) var(--ease-reveal) backwards;
 }
 
 .reveal[data-visible="true"] .agent-row:nth-child(2),
@@ -1465,7 +1465,17 @@ svg {
   }
 
   .external-link--block:hover {
-    transform: scale(1.01);
+    transform: scale(1.003);
+  }
+
+  .agent-row:has(~ .agent-row:hover),
+  .skill-bar:has(~ .skill-bar:hover) {
+    transform: translateY(-0.125rem);
+  }
+
+  .agent-row:hover ~ .agent-row,
+  .skill-bar:hover ~ .skill-bar {
+    transform: translateY(0.125rem);
   }
 
   .external-link:hover:active {
@@ -1473,7 +1483,8 @@ svg {
   }
 
   .external-link--block:hover:active {
-    transform: scale(0.985);
+    transform: scale(0.997);
+    transition-duration: var(--dur-press);
   }
 
   .wordmark:hover .wordmark__mark {

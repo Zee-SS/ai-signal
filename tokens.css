@@ -63,6 +63,7 @@
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-nav: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-hover: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-reveal: cubic-bezier(0.22, 0.78, 0.28, 1);
   --ease-fill: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-pop: cubic-bezier(0.2, 1.32, 0.32, 1);
@@ -70,6 +71,7 @@
   --dur-micro: 160ms;
   --dur-short: 240ms;
   --dur-nav: 420ms;
+  --dur-block-hover: 420ms;
   --dur-reveal: 680ms;
   --dur-fill: 1500ms;
 

@@ -56,6 +56,51 @@ test("separates local and browser agents and shows skill momentum", async ({ pag
   await expect(page.getByRole("link", { name: /Fixture Skills/ })).toContainText("84");
 });
 
+test("large linked rows hover gently and make coordinated visual space", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium-1080p", "Desktop pointer-motion assertion");
+  await page.getByText("Skills gaining attention", { exact: true }).scrollIntoViewIfNeeded();
+
+  const firstRow = page.locator(".skill-bar").first();
+  await firstRow.evaluate((element) => {
+    const parent = element.parentNode;
+    parent?.appendChild(element.cloneNode(true));
+    parent?.appendChild(element.cloneNode(true));
+  });
+  await page.waitForTimeout(1100);
+
+  const rows = page.locator(".skill-bar");
+  await expect(rows).toHaveCount(3);
+  const transition = await rows.nth(1).evaluate((element) => ({
+    duration: getComputedStyle(element).transitionDuration,
+    easing: getComputedStyle(element).transitionTimingFunction,
+  }));
+  expect(transition.duration.split(", ")).toEqual(["0.42s", "0.42s", "0.42s"]);
+  expect(transition.easing).toBe(Array(3).fill("cubic-bezier(0.65, 0, 0.35, 1)").join(", "));
+
+  const before = await rows.evaluateAll((elements) => elements.map((element) => ({
+    offsetTop: (element as HTMLElement).offsetTop,
+    rect: element.getBoundingClientRect().toJSON(),
+  })));
+  await rows.nth(1).hover();
+  await page.waitForTimeout(210);
+  const during = await rows.evaluateAll((elements) => elements.map((element) => ({
+    offsetTop: (element as HTMLElement).offsetTop,
+    rect: element.getBoundingClientRect().toJSON(),
+  })));
+  const firstBefore = before[0]!;
+  const hoveredBefore = before[1]!;
+  const lastBefore = before[2]!;
+  const firstDuring = during[0]!;
+  const hoveredDuring = during[1]!;
+  const lastDuring = during[2]!;
+
+  expect(firstDuring.rect.y).toBeLessThan(firstBefore.rect.y);
+  expect(lastDuring.rect.y).toBeGreaterThan(lastBefore.rect.y);
+  expect(hoveredDuring.rect.width / hoveredBefore.rect.width).toBeGreaterThan(1);
+  expect(hoveredDuring.rect.width / hoveredBefore.rect.width).toBeLessThanOrEqual(1.0035);
+  expect(during.map((row) => row.offsetTop)).toEqual(before.map((row) => row.offsetTop));
+});
+
 test("navigation morphs into a rounded sticky island after scrolling", async ({ page }) => {
   await page.getByRole("link", { name: "Agents + skills" }).click();
   await expect(page.getByRole("heading", { name: "Where the coding happens matters." })).toBeInViewport();
