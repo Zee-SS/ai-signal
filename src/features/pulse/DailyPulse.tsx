@@ -68,7 +68,7 @@ export function DailyPulse({ data, lastVisitAt, onMarkSeen }: DailyPulseProps) {
             <div className="decision-card__icon"><PiggyBank aria-hidden="true" weight="duotone" /></div>
             <p>Value trade-off</p>
             <strong>{value.model}</strong>
-            <div className="decision-card__metric"><b>${value.costPerProblem.toFixed(2)}</b><span>per benchmark problem</span></div>
+            <div className="decision-card__metric"><b>${value.costPerProblem.toFixed(2)}</b><span title="Per benchmark task">/ task</span></div>
             <a href={value.qualitySourceUrl} target="_blank" rel="noopener noreferrer">Run data <ArrowSquareOut aria-hidden="true" /></a>
           </article>
         )}
