@@ -62,10 +62,12 @@
   --page-gutter: clamp(1rem, 2.6vw, 2.5rem);
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-nav: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-pop: cubic-bezier(0.2, 1.32, 0.32, 1);
   --dur-press: 90ms;
   --dur-micro: 160ms;
   --dur-short: 240ms;
+  --dur-nav: 420ms;
   --dur-reveal: 360ms;
 
   --z-sticky: 20;

@@ -174,11 +174,14 @@ svg {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   min-height: 3.5rem;
+  max-width: 100%;
+  margin-inline: auto;
   padding-inline: var(--space-xs);
   border: 1px solid transparent;
   background: color-mix(in oklch, var(--color-paper) 96%, transparent);
   pointer-events: auto;
-  transition: border-color var(--dur-short) var(--ease-out), border-radius var(--dur-short) var(--ease-out), background-color var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out);
+  transform: translateY(0);
+  transition: max-width var(--dur-nav) var(--ease-nav), padding-inline var(--dur-nav) var(--ease-nav), border-color var(--dur-nav) var(--ease-nav), border-radius var(--dur-nav) var(--ease-nav), background-color var(--dur-nav) var(--ease-nav), box-shadow var(--dur-nav) var(--ease-nav), transform var(--dur-nav) var(--ease-nav);
 }
 
 .wordmark {
@@ -543,8 +546,9 @@ svg {
 .decision-card__metric b {
   font-family: var(--font-display);
   font-size: var(--text-xl);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.04em;
+  font-kerning: none;
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0.015em;
 }
 
 .decision-card__metric span,
@@ -780,6 +784,8 @@ svg {
 .model-rank-row b {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0.012em;
 }
 
 .model-detail {
@@ -854,6 +860,8 @@ svg {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   font-weight: 700;
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0.012em;
 }
 
 .model-detail__sources {
@@ -1471,7 +1479,7 @@ svg {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     opacity: 1;
-    transition: opacity var(--dur-micro) var(--ease-out), transform var(--dur-short) var(--ease-out);
+    transition: opacity 300ms var(--ease-out), transform var(--dur-nav) var(--ease-nav);
   }
 
   .site-header[data-compact="true"] .header-island {
