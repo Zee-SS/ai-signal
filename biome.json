@@ -7,7 +7,7 @@
 			"!coverage",
 			"!playwright-report",
 			"!test-results",
-			"!.wrangler",
+			"!**/.wrangler",
 			"!node_modules"
 		]
 	},

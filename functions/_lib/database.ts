@@ -291,6 +291,25 @@ export async function readItems(
   });
 }
 
+async function readRepositoryItems(db: D1Database, sources: SourceSummary[]): Promise<ApiItem[]> {
+  const sourceIds = SOURCE_CONFIG
+    .filter((source) => source.adapter.type === "github_repository")
+    .map((source) => source.id);
+  if (!sourceIds.length) return [];
+  const placeholders = sourceIds.map(() => "?").join(", ");
+  const response = await db.prepare(`
+    SELECT * FROM items
+    WHERE source_id IN (${placeholders})
+    ORDER BY fetched_at DESC
+    LIMIT 100
+  `).bind(...sourceIds).all<ItemRow>();
+  const sourceMap = new Map(sources.map((source) => [source.id, source]));
+  return response.results.flatMap((row) => {
+    const source = sourceMap.get(row.source_id);
+    return source ? [mapItem(row, source)] : [];
+  });
+}
+
 export async function readModels(db: D1Database, limit = 100): Promise<Model[]> {
   const response = await db.prepare(`
     SELECT * FROM models
@@ -387,8 +406,9 @@ export async function readLatestSync(db: D1Database): Promise<SyncRun | null> {
 
 export async function readDashboard(db: D1Database, environment: DashboardResponse["meta"]["environment"]): Promise<DashboardResponse> {
   const sources = await readSources(db);
-  const [items, models, benchmarks, events, latestSync] = await Promise.all([
+  const [items, repositoryItems, models, benchmarks, events, latestSync] = await Promise.all([
     readItems(db, sources, { limit: 160 }),
+    readRepositoryItems(db, sources),
     readModels(db, 100),
     readBenchmarks(db),
     readEvents(db),
@@ -430,7 +450,7 @@ export async function readDashboard(db: D1Database, environment: DashboardRespon
     events,
     trends: buildTrendTopics(items, new Date(generatedAt)),
     codingModels: codingModelSignalSchema.array().parse(codingModelSnapshot),
-    codingLandscape: buildCodingLandscape(items, sources, new Date(generatedAt)),
+    codingLandscape: buildCodingLandscape(repositoryItems, sources, new Date(generatedAt)),
     sources,
     latestSync,
   };
