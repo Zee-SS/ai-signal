@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import { developmentDashboard } from "../../src/fixtures/dashboard";
 
 test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light" });
   await page.route("**/api/dashboard", async (route) => {
     await route.fulfill({
       status: 200,
@@ -25,6 +26,7 @@ test("loads the focused coding pulse with no serious accessibility violations", 
   await expect(page.getByRole("searchbox")).toHaveCount(0);
   await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
   await expect(page.getByText("Development fixture", { exact: true }).first()).toBeVisible();
+  await page.waitForTimeout(1100);
 
   const accessibility = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   const violations = accessibility.violations.map((violation) => ({
@@ -73,6 +75,23 @@ test("source links retain original destinations and safe new-tab behavior", asyn
   await expect(qualitySource).toHaveAttribute("href", "https://example.com/quality");
   await expect(qualitySource).toHaveAttribute("target", "_blank");
   await expect(qualitySource).toHaveAttribute("rel", /noopener/);
+});
+
+test("night mode is accessible and persists on this device", async ({ page }) => {
+  const toggle = page.getByRole("button", { name: "Switch to dark mode" });
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  expect(await toggle.evaluate((element) => element.nextElementSibling?.classList.contains("header-github"))).toBe(true);
+  await toggle.click();
+  await page.waitForTimeout(350);
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("button", { name: "Switch to light mode" })).toHaveAttribute("aria-pressed", "true");
+  expect(await page.evaluate(() => localStorage.getItem("ai-signal:theme:v1"))).toBe('"dark"');
+
+  const accessibility = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect(accessibility.violations, JSON.stringify(accessibility.violations, null, 2)).toEqual([]);
+
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 });
 
 test("release radar exports a valid ICS file", async ({ page }) => {

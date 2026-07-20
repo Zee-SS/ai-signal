@@ -38,6 +38,7 @@ body {
   line-height: 1.5;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 320ms var(--ease-out), color 320ms var(--ease-out);
 }
 
 button,
@@ -287,6 +288,16 @@ svg {
   opacity: 0.5;
 }
 
+.theme-toggle__icon {
+  display: grid;
+  place-items: center;
+  transition: transform 300ms var(--ease-nav);
+}
+
+.theme-toggle__icon[data-theme="dark"] {
+  transform: rotate(18deg) scale(1.04);
+}
+
 .header-github,
 .source-health span {
   display: none;
@@ -364,8 +375,8 @@ svg {
 .section-reveal {
   scroll-margin-top: 7rem;
   opacity: 0;
-  transform: translateY(0.75rem) scale(0.995);
-  transition: opacity var(--dur-reveal) var(--ease-out), transform var(--dur-reveal) var(--ease-out);
+  transform: translateY(1.35rem) scale(0.988);
+  transition: opacity var(--dur-reveal) var(--ease-reveal), transform var(--dur-reveal) var(--ease-reveal);
 }
 
 .section-reveal[data-visible="true"] {
@@ -487,12 +498,12 @@ svg {
 }
 
 .reveal[data-visible="true"] .decision-card {
-  animation: item-pop var(--dur-reveal) var(--ease-out) both;
+  animation: item-pop var(--dur-reveal) var(--ease-reveal) both;
 }
 
-.reveal[data-visible="true"] .decision-card:nth-child(2) { animation-delay: 45ms; }
-.reveal[data-visible="true"] .decision-card:nth-child(3) { animation-delay: 90ms; }
-.reveal[data-visible="true"] .decision-card:nth-child(4) { animation-delay: 135ms; }
+.reveal[data-visible="true"] .decision-card:nth-child(2) { animation-delay: 80ms; }
+.reveal[data-visible="true"] .decision-card:nth-child(3) { animation-delay: 160ms; }
+.reveal[data-visible="true"] .decision-card:nth-child(4) { animation-delay: 240ms; }
 
 .decision-card--leader {
   border-color: var(--color-rule-2);
@@ -698,12 +709,12 @@ svg {
 }
 
 .reveal[data-visible="true"] .model-point circle {
-  animation: point-pop var(--dur-reveal) var(--ease-out) both;
+  animation: point-pop var(--dur-reveal) var(--ease-reveal) both;
 }
 
-.reveal[data-visible="true"] .model-point:nth-of-type(2) circle { animation-delay: 50ms; }
-.reveal[data-visible="true"] .model-point:nth-of-type(3) circle { animation-delay: 100ms; }
-.reveal[data-visible="true"] .model-point:nth-of-type(4) circle { animation-delay: 150ms; }
+.reveal[data-visible="true"] .model-point:nth-of-type(2) circle { animation-delay: 80ms; }
+.reveal[data-visible="true"] .model-point:nth-of-type(3) circle { animation-delay: 160ms; }
+.reveal[data-visible="true"] .model-point:nth-of-type(4) circle { animation-delay: 240ms; }
 
 .model-point text:not(.model-point__label) {
   fill: var(--color-primary-ink);
@@ -1095,26 +1106,30 @@ svg {
   height: 100%;
   border-radius: inherit;
   background: var(--color-accent);
-  transform: scaleX(1);
-  transform-origin: left;
-  transition: transform 700ms var(--ease-out);
+  clip-path: inset(0 0 0 0 round 99px);
+  transition: clip-path var(--dur-fill) var(--ease-fill) 180ms;
 }
 
 .reveal[data-visible="false"] .skill-bar__track > span {
-  transform: scaleX(0);
+  clip-path: inset(0 100% 0 0 round 99px);
 }
+
+.skill-bar:nth-child(2) .skill-bar__track > span { transition-delay: 260ms; }
+.skill-bar:nth-child(3) .skill-bar__track > span { transition-delay: 340ms; }
+.skill-bar:nth-child(4) .skill-bar__track > span { transition-delay: 420ms; }
+.skill-bar:nth-child(5) .skill-bar__track > span { transition-delay: 500ms; }
 
 .reveal[data-visible="true"] .agent-row,
 .reveal[data-visible="true"] .skill-bar {
-  animation: item-pop var(--dur-reveal) var(--ease-out) both;
+  animation: item-pop var(--dur-reveal) var(--ease-reveal) both;
 }
 
 .reveal[data-visible="true"] .agent-row:nth-child(2),
-.reveal[data-visible="true"] .skill-bar:nth-child(2) { animation-delay: 45ms; }
+.reveal[data-visible="true"] .skill-bar:nth-child(2) { animation-delay: 80ms; }
 .reveal[data-visible="true"] .agent-row:nth-child(3),
-.reveal[data-visible="true"] .skill-bar:nth-child(3) { animation-delay: 90ms; }
+.reveal[data-visible="true"] .skill-bar:nth-child(3) { animation-delay: 160ms; }
 .reveal[data-visible="true"] .agent-row:nth-child(4),
-.reveal[data-visible="true"] .skill-bar:nth-child(4) { animation-delay: 135ms; }
+.reveal[data-visible="true"] .skill-bar:nth-child(4) { animation-delay: 240ms; }
 
 .skill-bar > b {
   font-family: var(--font-display);
@@ -1406,11 +1421,11 @@ svg {
 }
 
 @keyframes item-pop {
-  from { opacity: 0; transform: translateY(0.55rem) scale(0.975); }
+  from { opacity: 0; transform: translateY(0.95rem) scale(0.965); }
 }
 
 @keyframes point-pop {
-  from { opacity: 0; transform: scale(0.72); }
+  from { opacity: 0; transform: scale(0.58); }
 }
 
 @keyframes skeleton-pulse {

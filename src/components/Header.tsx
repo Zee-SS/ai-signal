@@ -1,8 +1,9 @@
-import { ArrowClockwise, GithubLogo, Pulse } from "@phosphor-icons/react";
+import { ArrowClockwise, GithubLogo, Moon, Pulse, Sun } from "@phosphor-icons/react";
 import { formatCapeTownDate } from "@shared/lib/dates";
 import type { DashboardResponse, SourceSummary } from "@shared/schemas/domain";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { REPOSITORY_URL } from "@/lib/repository";
+import { applyTheme, currentTheme, type Theme } from "@/lib/theme";
 import { SignalMark } from "./SignalMark";
 
 const NAV_LINKS = [
@@ -32,6 +33,7 @@ interface HeaderProps {
 
 export function Header({ meta, sources, onRefresh, refreshing }: HeaderProps) {
   const [compact, setCompact] = useState(false);
+  const [theme, setTheme] = useState<Theme>(() => currentTheme());
   const sentinelRef = useRef<HTMLDivElement>(null);
   const health = useMemo(() => healthLabel(sources), [sources]);
 
@@ -42,6 +44,12 @@ export function Header({ meta, sources, onRefresh, refreshing }: HeaderProps) {
     observer.observe(sentinel);
     return () => observer.disconnect();
   }, []);
+
+  const toggleTheme = (): void => {
+    const nextTheme: Theme = theme === "light" ? "dark" : "light";
+    applyTheme(nextTheme, true);
+    setTheme(nextTheme);
+  };
 
   return (
     <>
@@ -61,6 +69,9 @@ export function Header({ meta, sources, onRefresh, refreshing }: HeaderProps) {
                 <Pulse aria-hidden="true" weight="fill" />
                 <span>{health.label}</span>
               </a>
+              <button className="icon-button theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`} aria-pressed={theme === "dark"} title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}>
+                <span className="theme-toggle__icon" data-theme={theme}>{theme === "light" ? <Moon aria-hidden="true" size={19} weight="fill" /> : <Sun aria-hidden="true" size={19} weight="fill" />}</span>
+              </button>
               {REPOSITORY_URL && (
                 <a className="icon-button header-github" href={REPOSITORY_URL} target="_blank" rel="noopener noreferrer" aria-label="Open AI Signal repository in a new tab">
                   <GithubLogo aria-hidden="true" size={19} />
