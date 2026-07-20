@@ -139,6 +139,64 @@ test("night mode is accessible and persists on this device", async ({ page }) =>
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 });
 
+test("reload control reloads the document and every reload starts at the top", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile-390", "Desktop document reload assertion");
+  await page.evaluate(() => {
+    const root = document.documentElement;
+    root.style.scrollBehavior = "auto";
+    window.scrollTo(0, document.body.scrollHeight);
+    root.style.removeProperty("scroll-behavior");
+    (window as Window & { __aiSignalDocumentMarker?: boolean }).__aiSignalDocumentMarker = true;
+  });
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+
+  const reloadNavigation = page.waitForNavigation({ waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reload AI Signal from the top" }).click();
+  await reloadNavigation;
+  await expect(page.getByRole("heading", { name: /The coding edge/ })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  expect(await page.evaluate(() => (window as Window & { __aiSignalDocumentMarker?: boolean }).__aiSignalDocumentMarker)).toBeUndefined();
+
+  await page.evaluate(() => {
+    const root = document.documentElement;
+    root.style.scrollBehavior = "auto";
+    window.scrollTo(0, document.body.scrollHeight);
+    root.style.removeProperty("scroll-behavior");
+  });
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("heading", { name: /The coding edge/ })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+});
+
+test("desktop wheel scrolling settles with a slight spring overshoot", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile-390", "Desktop wheel-motion assertion");
+  const samplesPromise = page.evaluate(() => new Promise<number[]>((resolve) => {
+    const samples: number[] = [];
+    let started = false;
+    const sample = (): void => {
+      const active = document.documentElement.dataset.scrollMotion === "active";
+      if (active) started = true;
+      samples.push(window.scrollY);
+      if (started && !active) {
+        resolve(samples);
+        return;
+      }
+      requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+  }));
+
+  await page.mouse.wheel(0, 600);
+  const samples = await samplesPromise;
+  const finalPosition = samples.at(-1) ?? 0;
+  const maximumPosition = Math.max(...samples);
+  expect(finalPosition).toBeGreaterThan(300);
+  expect(maximumPosition).toBeGreaterThan(finalPosition + 1);
+  expect(maximumPosition).toBeLessThan(finalPosition * 1.025);
+  expect(new Set(samples.map((sample) => Math.round(sample))).size).toBeGreaterThan(10);
+});
+
 test("release radar exports a valid ICS file", async ({ page }) => {
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download Development fixture: verified future date calendar file" }).click();
@@ -160,8 +218,22 @@ test("the 390px layout has no horizontal overflow and keeps 44px controls", asyn
   await expect(page.getByRole("link", { name: /Fixture Cloud Agent/ })).toBeAttached();
 });
 
-test("reduced-motion mode removes reveal and press transitions", async ({ page }) => {
+test("reduced-motion mode removes reveal and press transitions", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
+  if (testInfo.project.name === "mobile-390") {
+    expect(await page.evaluate(() => matchMedia("(pointer: fine)").matches)).toBe(false);
+  } else {
+    await page.evaluate(() => {
+      const testWindow = window as Window & { __wheelPrevented?: boolean };
+      delete testWindow.__wheelPrevented;
+      window.addEventListener("wheel", (event) => {
+        testWindow.__wheelPrevented = event.defaultPrevented;
+      }, { once: true });
+    });
+    await page.mouse.wheel(0, 120);
+    await expect.poll(() => page.evaluate(() => (window as Window & { __wheelPrevented?: boolean }).__wheelPrevented)).toBe(false);
+  }
+  await expect(page.locator("html")).not.toHaveAttribute("data-scroll-motion", "active");
   const duration = await page.getByRole("button", { name: "Quality × cost" }).evaluate((element) => getComputedStyle(element).transitionDuration);
   expect(duration).toMatch(/0\.001s|1ms/);
 });

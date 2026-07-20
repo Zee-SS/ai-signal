@@ -26,6 +26,10 @@ html {
   background: var(--color-paper);
 }
 
+html[data-scroll-motion="active"] {
+  scroll-behavior: auto;
+}
+
 body {
   margin: 0;
   min-height: 100dvh;

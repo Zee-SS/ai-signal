@@ -20,13 +20,13 @@ export default function App() {
   const [lastVisitAt, setLastVisitAt] = useState<string | null>(() => readStorage<string | null>(STORAGE_KEYS.lastVisit, null));
 
   if (!data && state === "loading") {
-    return <div id="top"><Header meta={null} sources={[]} onRefresh={reload} refreshing /><DashboardSkeleton /></div>;
+    return <div id="top"><Header meta={null} sources={[]} /><DashboardSkeleton /></div>;
   }
 
   if (!data || !dashboardResponseSchema.safeParse(data).success) {
     return (
       <div id="top">
-        <Header meta={null} sources={[]} onRefresh={reload} refreshing={false} />
+        <Header meta={null} sources={[]} />
         <main id="main-content" className="page-shell error-page">
           <EmptyState
             title="Verified coding data is unavailable"
@@ -47,7 +47,7 @@ export default function App() {
 
   return (
     <div id="top">
-      <Header meta={data.meta} sources={data.sources} onRefresh={reload} refreshing={state === "loading"} />
+      <Header meta={data.meta} sources={data.sources} />
       <main id="main-content" className="page-shell">
         {(!online || data.meta.fixture || data.meta.isStale || partialFailures.length > 0) && (
           <div className="data-warning" role="status" data-fixture={data.meta.fixture ? "true" : "false"}>

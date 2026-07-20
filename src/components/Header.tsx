@@ -2,6 +2,7 @@ import { ArrowClockwise, GithubLogo, Moon, Pulse, Sun } from "@phosphor-icons/re
 import { formatCapeTownDate } from "@shared/lib/dates";
 import type { DashboardResponse, SourceSummary } from "@shared/schemas/domain";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { reloadPageFromTop } from "@/lib/page-scroll";
 import { REPOSITORY_URL } from "@/lib/repository";
 import { applyTheme, currentTheme, type Theme } from "@/lib/theme";
 import { SignalMark } from "./SignalMark";
@@ -27,11 +28,9 @@ function healthLabel(sources: SourceSummary[]): { label: string; tone: string } 
 interface HeaderProps {
   meta: DashboardResponse["meta"] | null;
   sources: SourceSummary[];
-  onRefresh: () => void;
-  refreshing: boolean;
 }
 
-export function Header({ meta, sources, onRefresh, refreshing }: HeaderProps) {
+export function Header({ meta, sources }: HeaderProps) {
   const [compact, setCompact] = useState(false);
   const [theme, setTheme] = useState<Theme>(() => currentTheme());
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -77,8 +76,8 @@ export function Header({ meta, sources, onRefresh, refreshing }: HeaderProps) {
                   <GithubLogo aria-hidden="true" size={19} />
                 </a>
               )}
-              <button className="icon-button" type="button" onClick={onRefresh} aria-label="Refresh coding signal" disabled={refreshing}>
-                <ArrowClockwise aria-hidden="true" size={19} className={refreshing ? "is-spinning" : undefined} />
+              <button className="icon-button" type="button" onClick={reloadPageFromTop} aria-label="Reload AI Signal from the top" title="Reload AI Signal from the top">
+                <ArrowClockwise aria-hidden="true" size={19} />
               </button>
             </div>
           </div>
