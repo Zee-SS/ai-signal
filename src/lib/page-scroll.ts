@@ -1,20 +1,22 @@
-const SPRING_STIFFNESS = 82;
-const SPRING_DAMPING = 14.6;
-const REST_DISTANCE = 0.2;
-const REST_SPEED = 0.5;
+const GLIDE_RESPONSE_PER_SECOND = 8.5;
+const GLIDE_DISTANCE_MULTIPLIER = 1.0125;
+const REST_DISTANCE = 0.12;
+const REST_SPEED = 0.75;
 const MAX_FRAME_SECONDS = 1 / 30;
-const PHYSICS_STEP_SECONDS = 1 / 120;
 
-export interface ScrollSpringState {
+export interface ScrollGlideState {
   position: number;
   velocity: number;
 }
 
-export function advanceScrollSpring(state: ScrollSpringState, target: number, deltaSeconds: number): ScrollSpringState {
-  const acceleration = (target - state.position) * SPRING_STIFFNESS - state.velocity * SPRING_DAMPING;
+export function advanceScrollGlide(state: ScrollGlideState, target: number, deltaSeconds: number): ScrollGlideState {
+  if (deltaSeconds <= 0 || state.position === target) return { position: state.position, velocity: 0 };
+
+  const blend = 1 - Math.exp(-GLIDE_RESPONSE_PER_SECOND * deltaSeconds);
+  const movement = (target - state.position) * blend;
   return {
-    position: state.position + state.velocity * deltaSeconds,
-    velocity: state.velocity + acceleration * deltaSeconds,
+    position: state.position + movement,
+    velocity: movement / deltaSeconds,
   };
 }
 
@@ -67,12 +69,12 @@ export function reloadPageFromTop(): void {
   window.location.reload();
 }
 
-function installSpringWheelScroll(): () => void {
+function installGlideWheelScroll(): () => void {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const finePointer = window.matchMedia("(pointer: fine)");
   const root = document.documentElement;
-  const spring: ScrollSpringState = { position: window.scrollY, velocity: 0 };
-  let target = spring.position;
+  const glide: ScrollGlideState = { position: window.scrollY, velocity: 0 };
+  let target = glide.position;
   let animationFrame = 0;
   let lastFrameAt = 0;
 
@@ -82,36 +84,32 @@ function installSpringWheelScroll(): () => void {
     if (animationFrame) cancelAnimationFrame(animationFrame);
     animationFrame = 0;
     lastFrameAt = 0;
-    spring.position = window.scrollY;
-    spring.velocity = 0;
-    target = spring.position;
+    glide.position = window.scrollY;
+    glide.velocity = 0;
+    target = glide.position;
     delete root.dataset.scrollMotion;
   };
 
   const tick = (frameAt: number): void => {
     const maximum = scrollMaximum();
     target = clamp(target, 0, maximum);
-    let remaining = lastFrameAt ? Math.min((frameAt - lastFrameAt) / 1000, MAX_FRAME_SECONDS) : 1 / 60;
+    const elapsed = lastFrameAt ? Math.min((frameAt - lastFrameAt) / 1000, MAX_FRAME_SECONDS) : 1 / 60;
     lastFrameAt = frameAt;
 
-    while (remaining > 0) {
-      const step = Math.min(remaining, PHYSICS_STEP_SECONDS);
-      const next = advanceScrollSpring(spring, target, step);
-      spring.position = next.position;
-      spring.velocity = next.velocity;
-      remaining -= step;
-    }
+    const next = advanceScrollGlide(glide, target, elapsed);
+    glide.position = next.position;
+    glide.velocity = next.velocity;
 
-    const constrainedPosition = clamp(spring.position, 0, maximum);
-    if (constrainedPosition !== spring.position) {
-      spring.position = constrainedPosition;
-      spring.velocity = 0;
+    const constrainedPosition = clamp(glide.position, 0, maximum);
+    if (constrainedPosition !== glide.position) {
+      glide.position = constrainedPosition;
+      glide.velocity = 0;
     }
-    window.scrollTo(0, spring.position);
+    window.scrollTo(0, glide.position);
 
-    if (Math.abs(target - spring.position) <= REST_DISTANCE && Math.abs(spring.velocity) <= REST_SPEED) {
-      spring.position = target;
-      spring.velocity = 0;
+    if (Math.abs(target - glide.position) <= REST_DISTANCE && Math.abs(glide.velocity) <= REST_SPEED) {
+      glide.position = target;
+      glide.velocity = 0;
       window.scrollTo(0, target);
       animationFrame = 0;
       lastFrameAt = 0;
@@ -124,7 +122,7 @@ function installSpringWheelScroll(): () => void {
 
   const start = (): void => {
     if (animationFrame) return;
-    spring.position = window.scrollY;
+    glide.position = window.scrollY;
     root.dataset.scrollMotion = "active";
     animationFrame = requestAnimationFrame(tick);
   };
@@ -135,13 +133,14 @@ function installSpringWheelScroll(): () => void {
     if (!rawDelta || nestedScrollerCanMove(event.target, rawDelta)) return;
 
     if (!animationFrame) {
-      spring.position = window.scrollY;
-      spring.velocity = 0;
-      target = spring.position;
+      glide.position = window.scrollY;
+      glide.velocity = 0;
+      target = glide.position;
     }
     const maximumDelta = Math.max(120, window.innerHeight * 0.65);
-    const nextTarget = clamp(target + clamp(rawDelta, -maximumDelta, maximumDelta), 0, scrollMaximum());
-    if (nextTarget === target && Math.abs(target - spring.position) <= REST_DISTANCE) return;
+    const glidingDelta = clamp(rawDelta, -maximumDelta, maximumDelta) * GLIDE_DISTANCE_MULTIPLIER;
+    const nextTarget = clamp(target + glidingDelta, 0, scrollMaximum());
+    if (nextTarget === target && Math.abs(target - glide.position) <= REST_DISTANCE) return;
 
     event.preventDefault();
     target = nextTarget;
@@ -192,10 +191,10 @@ export function initializePageScroll(): () => void {
     });
   }
 
-  const disposeSpringScroll = installSpringWheelScroll();
+  const disposeGlideScroll = installGlideWheelScroll();
   return () => {
     if (firstResetFrame) cancelAnimationFrame(firstResetFrame);
     if (secondResetFrame) cancelAnimationFrame(secondResetFrame);
-    disposeSpringScroll();
+    disposeGlideScroll();
   };
 }

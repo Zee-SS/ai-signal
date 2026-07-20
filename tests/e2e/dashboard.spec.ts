@@ -169,7 +169,7 @@ test("reload control reloads the document and every reload starts at the top", a
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 });
 
-test("desktop wheel scrolling settles with a slight spring overshoot", async ({ page }, testInfo) => {
+test("desktop wheel scrolling glides gently without overshoot", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === "mobile-390", "Desktop wheel-motion assertion");
   const samplesPromise = page.evaluate(() => new Promise<number[]>((resolve) => {
     const samples: number[] = [];
@@ -191,9 +191,13 @@ test("desktop wheel scrolling settles with a slight spring overshoot", async ({ 
   const samples = await samplesPromise;
   const finalPosition = samples.at(-1) ?? 0;
   const maximumPosition = Math.max(...samples);
+  const baseDelta = Math.min(600, (await page.evaluate(() => window.innerHeight)) * 0.65);
+  const monotonic = samples.every((sample, index) => index === 0 || sample >= (samples[index - 1] ?? sample) - 0.25);
   expect(finalPosition).toBeGreaterThan(300);
-  expect(maximumPosition).toBeGreaterThan(finalPosition + 1);
-  expect(maximumPosition).toBeLessThan(finalPosition * 1.025);
+  expect(finalPosition).toBeGreaterThan(baseDelta);
+  expect(finalPosition).toBeLessThanOrEqual(baseDelta * 1.02 + 1);
+  expect(maximumPosition - finalPosition).toBeLessThanOrEqual(0.5);
+  expect(monotonic).toBe(true);
   expect(new Set(samples.map((sample) => Math.round(sample))).size).toBeGreaterThan(10);
 });
 

@@ -17,7 +17,7 @@ The product deliberately excludes a global search box, a general news feed, long
 - **Release radar:** only source-backed confirmed or explicitly predicted launches for models, agents, and important coding tools, with ICS export.
 - **Source health:** a compact disclosure with fetch status, methodology, version, privacy statement, and original links.
 
-The white-first visual system uses light leaf-green accents, Bricolage Grotesque for display moments, Geist for the interface, and Geist Mono for measured data. Motion is short, tactile, and slightly bouncy; `prefers-reduced-motion` removes transforms and staggering.
+The white-first visual system uses light leaf-green accents, Bricolage Grotesque for display moments, Geist for the interface, and Geist Mono for measured data. Interaction motion is short and tactile, while desktop wheel scrolling uses a gentle no-rebound glide; `prefers-reduced-motion` removes transforms, staggering, and custom scrolling.
 
 ## Architecture
 
