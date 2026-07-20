@@ -10,7 +10,7 @@ function compactNumber(value: number | null): string {
 function AgentRow({ entry }: { entry: CodingLandscapeEntry }) {
   const Icon = entry.surface === "terminal" ? Terminal : entry.surface === "desktop" ? Desktop : Browser;
   return (
-    <a className="agent-row external-link" href={entry.url} target="_blank" rel="noopener noreferrer">
+    <a className="agent-row external-link external-link--block" href={entry.url} target="_blank" rel="noopener noreferrer">
       <span className="agent-row__icon"><Icon aria-hidden="true" /></span>
       <span className="agent-row__name"><strong>{entry.name}</strong><small>{entry.surface} · {entry.provider}</small></span>
       <span className="agent-row__metric"><b>{entry.momentumScore ?? "–"}</b><small>momentum</small></span>
@@ -54,7 +54,7 @@ export function ToolLandscape({ entries }: { entries: CodingLandscapeEntry[] }) 
         </div>
         <div className="skill-bars">
           {skills.length ? skills.map((skill, index) => (
-            <a key={skill.id} className="skill-bar external-link" href={skill.url} target="_blank" rel="noopener noreferrer">
+            <a key={skill.id} className="skill-bar external-link external-link--block" href={skill.url} target="_blank" rel="noopener noreferrer">
               <span className="skill-bar__rank">{String(index + 1).padStart(2, "0")}</span>
               <span className="skill-bar__body">
                 <span><strong>{skill.name}</strong><small>{compactNumber(skill.stars)} stars{skill.pushedAt ? ` · pushed ${formatCapeTownDate(skill.pushedAt)}` : ""}</small></span>
