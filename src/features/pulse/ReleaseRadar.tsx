@@ -28,7 +28,7 @@ export function ReleaseRadar({ events }: { events: ImportantEvent[] }) {
               <span className={`confidence-tag confidence-tag--${event.status}`}>{event.status}</span>
               <div><strong>{event.title}</strong>{event.description && <p>{event.description}</p>}<small>{event.provider ?? event.category} · verified {formatCapeTownDate(event.verifiedAt)}</small></div>
               <div className="release-actions">
-                <a href={event.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={`Open source for ${event.title}`}><ArrowSquareOut aria-hidden="true" /></a>
+                <a className="external-link" href={event.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={`Open source for ${event.title}`}><ArrowSquareOut aria-hidden="true" /></a>
                 <button type="button" onClick={() => downloadEventIcs(event)} aria-label={`Download ${event.title} calendar file`}><DownloadSimple aria-hidden="true" /></button>
               </div>
             </li>

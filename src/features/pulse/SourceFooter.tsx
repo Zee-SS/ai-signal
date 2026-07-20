@@ -14,7 +14,7 @@ export function SourceFooter({ data }: { data: DashboardResponse }) {
         <span>{healthy}/{enabled.length} sources healthy</span>
         <span>v{data.meta.version}</span>
         <span>No analytics · no account</span>
-        {REPOSITORY_URL && <a href={REPOSITORY_URL} target="_blank" rel="noopener noreferrer">Repository <ArrowSquareOut aria-hidden="true" /></a>}
+        {REPOSITORY_URL && <a className="external-link" href={REPOSITORY_URL} target="_blank" rel="noopener noreferrer">Repository <ArrowSquareOut aria-hidden="true" /></a>}
       </div>
       <details id="sources" className="source-details">
         <summary>Source health and methodology</summary>
@@ -28,7 +28,7 @@ export function SourceFooter({ data }: { data: DashboardResponse }) {
             {enabled.map((source) => (
               <li key={source.id} data-status={source.status}>
                 {source.status === "healthy" ? <CheckCircle aria-hidden="true" weight="fill" /> : <WarningCircle aria-hidden="true" weight="fill" />}
-                <span><a href={source.homepageUrl} target="_blank" rel="noopener noreferrer">{source.name} <ArrowSquareOut aria-hidden="true" /></a><small>{source.lastSuccessAt ? `Fetched ${formatCapeTownDateTime(source.lastSuccessAt)}` : "Awaiting first sync"}</small></span>
+                <span><a className="external-link" href={source.homepageUrl} target="_blank" rel="noopener noreferrer">{source.name} <ArrowSquareOut aria-hidden="true" /></a><small>{source.lastSuccessAt ? `Fetched ${formatCapeTownDateTime(source.lastSuccessAt)}` : "Awaiting first sync"}</small></span>
                 <b>{source.status}</b>
               </li>
             ))}

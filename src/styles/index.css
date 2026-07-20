@@ -793,6 +793,11 @@ svg {
   letter-spacing: 0.012em;
 }
 
+.model-rank-row b,
+.model-rank-row > span:last-child small {
+  white-space: nowrap;
+}
+
 .model-detail {
   display: grid;
   gap: var(--space-lg);
@@ -847,8 +852,9 @@ svg {
 
 .model-detail dl {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, max-content);
   gap: var(--space-sm);
+  justify-content: space-between;
 }
 
 .model-detail dl > div {
@@ -867,6 +873,26 @@ svg {
   font-weight: 700;
   font-variant-numeric: lining-nums tabular-nums;
   letter-spacing: 0.012em;
+  white-space: nowrap;
+}
+
+.model-detail dt,
+.surface-lane__heading small,
+.agent-row__metric,
+.release-timeline time span,
+.confidence-tag {
+  white-space: nowrap;
+}
+
+.agent-row__name small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.external-link {
+  transform-origin: center;
+  transition: color var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
 }
 
 .model-detail__sources {
@@ -1413,6 +1439,14 @@ svg {
     color: var(--color-primary-hover);
   }
 
+  .external-link:hover {
+    transform: scale(1.035);
+  }
+
+  .external-link:hover:active {
+    transform: scale(0.97);
+  }
+
   .wordmark:hover .wordmark__mark {
     transform: rotate(-4deg) scale(1.05);
   }
@@ -1645,6 +1679,10 @@ svg {
   .section-reveal,
   .site-header[data-compact="true"] .header-island,
   .site-header[data-compact="true"] .header-context {
+    transform: none;
+  }
+
+  .external-link:hover {
     transform: none;
   }
 }

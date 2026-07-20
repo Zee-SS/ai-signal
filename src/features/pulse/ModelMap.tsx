@@ -112,8 +112,8 @@ export function ModelMap({ models }: { models: CodingModelSignal[] }) {
                 <div><dt>Run cost</dt><dd>${selected.costPerProblem.toFixed(2)}</dd></div>
               </dl>
               <div className="model-detail__sources">
-                <a href={selected.qualitySourceUrl} target="_blank" rel="noopener noreferrer">Quality source <ArrowSquareOut aria-hidden="true" /></a>
-                <a href={selected.speedSourceUrl} target="_blank" rel="noopener noreferrer">Speed source <ArrowSquareOut aria-hidden="true" /></a>
+                <a className="external-link" href={selected.qualitySourceUrl} target="_blank" rel="noopener noreferrer">Quality source <ArrowSquareOut aria-hidden="true" /></a>
+                <a className="external-link" href={selected.speedSourceUrl} target="_blank" rel="noopener noreferrer">Speed source <ArrowSquareOut aria-hidden="true" /></a>
               </div>
             </aside>
           )}

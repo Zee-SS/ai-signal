@@ -51,7 +51,7 @@ export function DailyPulse({ data, lastVisitAt, onMarkSeen }: DailyPulseProps) {
             <p>Quality leader</p>
             <strong>{leader.model}</strong>
             <div className="decision-card__metric"><b>{leader.qualityScore}%</b><span>SWE-rebench resolved</span></div>
-            <a href={leader.qualitySourceUrl} target="_blank" rel="noopener noreferrer">Leaderboard <ArrowSquareOut aria-hidden="true" /></a>
+            <a className="external-link" href={leader.qualitySourceUrl} target="_blank" rel="noopener noreferrer">Leaderboard <ArrowSquareOut aria-hidden="true" /></a>
           </article>
         )}
         {fastest && (
@@ -60,7 +60,7 @@ export function DailyPulse({ data, lastVisitAt, onMarkSeen }: DailyPulseProps) {
             <p>Fastest in cohort</p>
             <strong>{fastest.model}</strong>
             <div className="decision-card__metric"><b>{fastest.speedTokensPerSecond}</b><span>output tok/s</span></div>
-            <a href={fastest.speedSourceUrl} target="_blank" rel="noopener noreferrer">Speed source <ArrowSquareOut aria-hidden="true" /></a>
+            <a className="external-link" href={fastest.speedSourceUrl} target="_blank" rel="noopener noreferrer">Speed source <ArrowSquareOut aria-hidden="true" /></a>
           </article>
         )}
         {value && (
@@ -69,7 +69,7 @@ export function DailyPulse({ data, lastVisitAt, onMarkSeen }: DailyPulseProps) {
             <p>Value trade-off</p>
             <strong>{value.model}</strong>
             <div className="decision-card__metric"><b>${value.costPerProblem.toFixed(2)}</b><span title="Per benchmark task">/ task</span></div>
-            <a href={value.qualitySourceUrl} target="_blank" rel="noopener noreferrer">Run data <ArrowSquareOut aria-hidden="true" /></a>
+            <a className="external-link" href={value.qualitySourceUrl} target="_blank" rel="noopener noreferrer">Run data <ArrowSquareOut aria-hidden="true" /></a>
           </article>
         )}
         <article className="decision-card decision-card--release">
@@ -79,7 +79,7 @@ export function DailyPulse({ data, lastVisitAt, onMarkSeen }: DailyPulseProps) {
             <>
               <strong>{release.title}</strong>
               <div className="decision-card__metric"><b>{formatCapeTownDate(release.publishedAt)}</b><span>{release.provider ?? release.source.name}</span></div>
-              <a href={release.url} target="_blank" rel="noopener noreferrer">Release notes <ArrowSquareOut aria-hidden="true" /></a>
+              <a className="external-link" href={release.url} target="_blank" rel="noopener noreferrer">Release notes <ArrowSquareOut aria-hidden="true" /></a>
             </>
           ) : (
             <><strong>No verified release yet</strong><span className="muted">The next sync will keep checking official repositories.</span></>
