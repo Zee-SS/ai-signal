@@ -10,36 +10,38 @@ web
 
 ## Users
 
-AI Signal is for a technically informed individual who follows model releases, coding agents, benchmarks, research, pricing, and provider changes. They open it in a desktop browser most days, usually on a 1080p monitor, and need to understand what changed in a few minutes without reading a noisy feed. The same prioritisation must survive on a 390px phone.
+AI Signal is a five-minute daily coding-intelligence check for a technically informed person. The primary surface is a 1920x1080 desktop browser, with the same ranking and provenance preserved on a 390px phone.
 
 ## Product Purpose
 
-AI Signal continuously gathers public, source-backed AI information, validates and ranks it deterministically, and presents the small subset that deserves attention. Success means the reader can identify the day's important changes, verify every claim at its original source, and leave without feeling behind.
+AI Signal answers four questions quickly: which coding models lead, which trade-offs matter, which coding agents or skill ecosystems are moving, and which verified releases are next. It continuously gathers public evidence, validates it, and presents a small visual briefing rather than a news feed.
 
 ## Positioning
 
-A daily AI intelligence desk that ranks evidence, not attention.
+A source-backed daily pulse for the AI coding scene.
 
 ## Brand Personality
 
-Exact, calm, and editorial. The interface should feel like a well-kept research desk: direct language, visible provenance, restrained colour, and no theatrical AI styling.
+Bright, exact, and lightly playful. The interface should feel like a well-tuned instrument: friendly green signals, crisp measurements, tactile controls, and no theatrical AI styling.
 
 ## Anti-references
 
-- Generic SaaS dashboards made from identical rounded cards.
-- Noisy chronological feeds that treat every item as equally important.
-- Purple-to-cyan AI gradients, glass panels, neon glows, fake terminals, and oversized marketing heroes.
-- Hidden or subjective ranking, unsupported claims, inferred release rumours, or unexplained benchmark comparisons.
-- Desktop layouts that merely shrink on mobile or tables that force horizontal scrolling.
+- Generic SaaS dashboards made from interchangeable cards.
+- Long news feeds, paper recommendations, broad conference calendars, or search-heavy workflows.
+- Rankings that collapse quality, speed, cost, and tool surface into one unexplained number.
+- Purple gradients, glass panels, neon glows, fake terminals, oversized heroes, or motivational AI slogans.
+- Inferred release rumours or claims without visible original sources.
+- Desktop tables that shrink into horizontal scrolling on mobile.
 
 ## Design Principles
 
-1. Evidence stays attached to every fact.
-2. Editorial hierarchy does the filtering before controls are needed.
-3. Density is useful only when scanning remains effortless.
-4. Failure is explicit: stale, unavailable, seeded, and manually curated data are visibly labelled.
-5. Familiar interactions disappear into the daily workflow.
+1. Show the trade-off, not only the rank.
+2. Prefer maps, bars, lanes, and timelines to paragraphs.
+3. Keep evidence attached to every measured value.
+4. Separate model capability from agent scaffolds, and local tools from browser or cloud tools.
+5. Make stale, unavailable, predicted, and manually verified data unmistakable.
+6. Let the daily scan end naturally within five minutes.
 
 ## Accessibility & Inclusion
 
-Target WCAG 2.2 AA. Provide semantic landmarks, logical headings, visible focus, 44px touch targets, keyboard navigation, non-colour status cues, reduced-motion support, robust text contrast, and responsive layouts from 320px upward.
+Target WCAG 2.2 AA. Provide semantic landmarks, logical headings, visible focus, 44px touch targets, keyboard access, non-colour status cues, reduced-motion support, robust text contrast, and responsive layouts from 320px upward.

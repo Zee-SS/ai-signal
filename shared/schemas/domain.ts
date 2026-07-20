@@ -16,6 +16,7 @@ export const sourceTypeSchema = z.enum([
   "rss",
   "atom",
   "github_releases",
+  "github_repository",
   "json_api",
   "arxiv",
   "hacker_news",
@@ -132,7 +133,44 @@ export const eventSchema = z.object({
   allDay: z.boolean(),
   sourceUrl: z.url(),
   verifiedAt: z.iso.datetime(),
-  status: z.enum(["confirmed", "cancelled", "archived"]),
+  status: z.enum(["confirmed", "predicted", "cancelled", "archived"]),
+});
+
+export const codingModelSignalSchema = z.object({
+  id: z.string().min(1),
+  model: z.string().min(1),
+  provider: z.string().min(1),
+  qualityRank: z.number().int().positive(),
+  qualityScore: z.number().min(0).max(100),
+  qualityMetric: z.literal("SWE-rebench resolved"),
+  qualityVariant: z.string().min(1),
+  qualitySourceUrl: z.url(),
+  speedTokensPerSecond: z.number().positive(),
+  speedVariant: z.string().min(1),
+  speedSourceUrl: z.url(),
+  costPerProblem: z.number().nonnegative(),
+  openWeight: z.boolean(),
+  nuance: z.string().min(1).max(220),
+  snapshotDate: z.iso.date(),
+  importMethod: z.literal("manual"),
+});
+
+export const codingLandscapeEntrySchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  provider: z.string().min(1),
+  kind: z.enum(["agent", "skill"]),
+  surface: z.enum(["terminal", "desktop", "browser", "portable"]),
+  description: z.string().min(1).max(180),
+  url: z.url(),
+  repository: z.string().min(3),
+  stars: z.number().int().nonnegative().nullable(),
+  forks: z.number().int().nonnegative().nullable(),
+  openIssues: z.number().int().nonnegative().nullable(),
+  pushedAt: z.iso.datetime().nullable(),
+  fetchedAt: z.iso.datetime().nullable(),
+  momentumScore: z.number().min(0).max(100).nullable(),
+  sourceStatus: sourceStatusSchema,
 });
 
 export const trendTopicSchema = z.object({
@@ -179,6 +217,8 @@ export const dashboardResponseSchema = z.object({
   benchmarks: z.array(benchmarkDefinitionSchema),
   events: z.array(eventSchema),
   trends: z.array(trendTopicSchema),
+  codingModels: z.array(codingModelSignalSchema),
+  codingLandscape: z.array(codingLandscapeEntrySchema),
   sources: z.array(sourceSummarySchema),
   latestSync: syncRunSchema.nullable(),
 });
@@ -193,6 +233,8 @@ export type Model = z.infer<typeof modelSchema>;
 export type BenchmarkResult = z.infer<typeof benchmarkResultSchema>;
 export type BenchmarkDefinition = z.infer<typeof benchmarkDefinitionSchema>;
 export type ImportantEvent = z.infer<typeof eventSchema>;
+export type CodingModelSignal = z.infer<typeof codingModelSignalSchema>;
+export type CodingLandscapeEntry = z.infer<typeof codingLandscapeEntrySchema>;
 export type TrendTopic = z.infer<typeof trendTopicSchema>;
 export type SyncRun = z.infer<typeof syncRunSchema>;
 export type DashboardResponse = z.infer<typeof dashboardResponseSchema>;

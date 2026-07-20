@@ -1,10 +1,10 @@
 {
-  "date": "2026-07-19",
+  "date": "2026-07-20",
   "framework": "React 19 with Vite 8",
-  "font": "Geist Variable and Geist Mono Variable",
-  "palette": "Custom OKLCH tokens in tokens.css",
-  "motion": "Native CSS transitions, IntersectionObserver, reduced-motion support",
+  "font": "Bricolage Grotesque Variable, Geist Variable, and Geist Mono Variable",
+  "palette": "White-first surfaces with a fresh leaf-green OKLCH accent system",
+  "motion": "Native CSS transitions and IntersectionObserver reveals, with physical bounce reserved for direct presses and complete reduced-motion support",
   "spacing": "4pt semantic scale",
-  "preserved": [],
-  "introduced": ["Ecosystem Index structure", "N10-derived compact rail", "Ft4 dense colophon"]
+  "preserved": ["Cloudflare D1 ingestion", "Pages Functions API", "source provenance", "stale-data fallback", "offline cache"],
+  "introduced": ["Map / Diagram structure", "N10 scroll-morphing navigation", "Ft2 compact trust footer", "source-backed model trade-off map"]
 }

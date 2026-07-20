@@ -1,5 +1,5 @@
-const CACHE_VERSION = "ai-signal-v1";
-const APP_SHELL = ["/", "/manifest.webmanifest", "/favicon.svg", "/app-mark.svg", "/icon-192.png", "/icon-512.png"];
+const CACHE_VERSION = "ai-signal-v2";
+const APP_SHELL = ["/", "/manifest.webmanifest", "/favicon.svg", "/app-mark.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_VERSION).then((cache) => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));

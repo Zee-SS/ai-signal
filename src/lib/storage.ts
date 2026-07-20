@@ -21,4 +21,5 @@ export const STORAGE_KEYS = {
   bookmarks: "ai-signal:bookmarks:v1",
   readItems: "ai-signal:read-items:v1",
   filters: "ai-signal:filters:v1",
+  modelMetric: "ai-signal:model-metric:v1",
 } as const;

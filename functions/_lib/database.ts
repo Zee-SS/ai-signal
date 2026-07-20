@@ -1,9 +1,13 @@
 import { BENCHMARK_DEFINITIONS } from "../../shared/constants/benchmarks";
+import codingModelSnapshot from "../../shared/data/coding-model-snapshot.json";
 import {
   type ApiItem,
   apiItemSchema,
   type BenchmarkDefinition,
   benchmarkResultSchema,
+  type CodingLandscapeEntry,
+  codingLandscapeEntrySchema,
+  codingModelSignalSchema,
   type DashboardResponse,
   eventSchema,
   type ImportantEvent,
@@ -102,7 +106,7 @@ interface EventRow {
   all_day: number;
   source_url: string;
   verified_at: string;
-  status: "confirmed" | "cancelled" | "archived";
+  status: "confirmed" | "predicted" | "cancelled" | "archived";
 }
 
 interface SyncRow {
@@ -327,11 +331,53 @@ export async function readBenchmarks(db: D1Database): Promise<BenchmarkDefinitio
 export async function readEvents(db: D1Database, includeArchived = false): Promise<ImportantEvent[]> {
   const response = await db.prepare(`
     SELECT * FROM events
-    WHERE (? = 1 OR (status = 'confirmed' AND COALESCE(ends_at, starts_at) >= ?))
+    WHERE (? = 1 OR (status IN ('confirmed', 'predicted') AND COALESCE(ends_at, starts_at) >= ?))
     ORDER BY starts_at ASC
     LIMIT 100
   `).bind(includeArchived ? 1 : 0, new Date().toISOString()).all<EventRow>();
   return response.results.map(mapEvent);
+}
+
+function buildCodingLandscape(items: ApiItem[], sources: SourceSummary[], now: Date): CodingLandscapeEntry[] {
+  const repositorySources = SOURCE_CONFIG.filter((source) => source.adapter.type === "github_repository");
+  const matchingItems = new Map(
+    items
+      .filter((item) => typeof item.metadata.repository === "string" && item.tags.includes("github-activity"))
+      .map((item) => [item.metadata.repository as string, item]),
+  );
+  const maximumLogStars = Math.max(
+    1,
+    ...Array.from(matchingItems.values(), (item) => Math.log10((typeof item.metadata.stars === "number" ? item.metadata.stars : 0) + 1)),
+  );
+  return repositorySources.map((source) => {
+    const config = source.adapter;
+    if (config.type !== "github_repository") throw new Error("Unexpected coding landscape source");
+    const item = matchingItems.get(config.repository);
+    const sourceHealth = sources.find((entry) => entry.id === source.id)?.status ?? "pending";
+    const stars = typeof item?.metadata.stars === "number" ? item.metadata.stars : null;
+    const pushedAt = typeof item?.metadata.pushedAt === "string" ? item.metadata.pushedAt : null;
+    const daysSincePush = pushedAt ? Math.max(0, (now.getTime() - new Date(pushedAt).getTime()) / 86_400_000) : null;
+    const momentumScore = stars === null || daysSincePush === null
+      ? null
+      : Math.round(Math.min(100, (Math.log10(stars + 1) / maximumLogStars) * 65 + Math.max(0, 35 - daysSincePush / 3)));
+    return codingLandscapeEntrySchema.parse({
+      id: source.id,
+      name: config.projectName,
+      provider: config.provider,
+      kind: config.kind,
+      surface: config.surface,
+      description: config.description,
+      url: source.homepageUrl,
+      repository: config.repository,
+      stars,
+      forks: typeof item?.metadata.forks === "number" ? item.metadata.forks : null,
+      openIssues: typeof item?.metadata.openIssues === "number" ? item.metadata.openIssues : null,
+      pushedAt,
+      fetchedAt: item?.fetchedAt ?? null,
+      momentumScore,
+      sourceStatus: sourceHealth,
+    });
+  }).sort((left, right) => (right.momentumScore ?? -1) - (left.momentumScore ?? -1));
 }
 
 export async function readLatestSync(db: D1Database): Promise<SyncRun | null> {
@@ -373,7 +419,7 @@ export async function readDashboard(db: D1Database, environment: DashboardRespon
       staleReason,
       environment,
       fixture: false,
-      version: "1.0.0",
+      version: "1.1.0",
       timezone: "Africa/Johannesburg",
       cache: API_CACHE,
     },
@@ -383,6 +429,8 @@ export async function readDashboard(db: D1Database, environment: DashboardRespon
     benchmarks,
     events,
     trends: buildTrendTopics(items, new Date(generatedAt)),
+    codingModels: codingModelSignalSchema.array().parse(codingModelSnapshot),
+    codingLandscape: buildCodingLandscape(items, sources, new Date(generatedAt)),
     sources,
     latestSync,
   };

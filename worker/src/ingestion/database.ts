@@ -17,6 +17,7 @@ function feedUrl(source: SourceDefinition): string | null {
   const adapter = source.adapter;
   if ("url" in adapter) return adapter.url;
   if (adapter.type === "github_releases") return `https://api.github.com/repos/${adapter.repository}/releases`;
+  if (adapter.type === "github_repository") return `https://api.github.com/repos/${adapter.repository}`;
   if (adapter.type === "hacker_news") return adapter.baseUrl;
   return null;
 }
@@ -210,7 +211,7 @@ export async function pruneExpiredData(db: D1Database, now: string): Promise<voi
   await db.batch([
     db.prepare(`
       UPDATE events SET status = 'archived', updated_at = ?
-      WHERE status = 'confirmed' AND COALESCE(ends_at, starts_at) < ?
+      WHERE status IN ('confirmed', 'predicted') AND COALESCE(ends_at, starts_at) < ?
     `).bind(now, now),
     db.prepare("DELETE FROM items WHERE published_at < ?").bind(cutoff),
   ]);

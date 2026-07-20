@@ -20,6 +20,17 @@ export interface GitHubAdapterConfig extends AdapterBase {
   tags: string[];
 }
 
+export interface GitHubRepositoryAdapterConfig extends AdapterBase {
+  type: "github_repository";
+  repository: string;
+  provider: string;
+  projectName: string;
+  kind: "agent" | "skill";
+  surface: "terminal" | "desktop" | "browser" | "portable";
+  description: string;
+  tags: string[];
+}
+
 export interface JsonAdapterConfig extends AdapterBase {
   type: "json_api";
   kind: "openrouter_models" | "huggingface_models";
@@ -55,6 +66,7 @@ export interface HtmlMetadataAdapterConfig extends AdapterBase {
 export type AdapterConfig =
   | FeedAdapterConfig
   | GitHubAdapterConfig
+  | GitHubRepositoryAdapterConfig
   | JsonAdapterConfig
   | ArxivAdapterConfig
   | HackerNewsAdapterConfig
@@ -376,6 +388,105 @@ export const SOURCE_CONFIG: SourceDefinition[] = [
     trustTier: 3,
     enabled: true,
     adapter: { type: "manual_json", kind: "benchmarks" },
+  },
+  {
+    id: "src_codex_repository",
+    slug: "codex-repository",
+    name: "Codex repository activity",
+    homepageUrl: "https://github.com/openai/codex",
+    trustTier: 2,
+    enabled: true,
+    adapter: { type: "github_repository", repository: "openai/codex", provider: "OpenAI", projectName: "Codex CLI", kind: "agent", surface: "terminal", description: "OpenAI coding agent for the terminal and desktop workflows.", tags: ["coding-agent", "terminal", "local"] },
+  },
+  {
+    id: "src_claude_code_repository",
+    slug: "claude-code-repository",
+    name: "Claude Code repository activity",
+    homepageUrl: "https://github.com/anthropics/claude-code",
+    trustTier: 2,
+    enabled: true,
+    adapter: { type: "github_repository", repository: "anthropics/claude-code", provider: "Anthropic", projectName: "Claude Code", kind: "agent", surface: "terminal", description: "Anthropic coding agent for terminal-led repository work.", tags: ["coding-agent", "terminal", "local"] },
+  },
+  {
+    id: "src_gemini_cli_repository",
+    slug: "gemini-cli-repository",
+    name: "Gemini CLI repository activity",
+    homepageUrl: "https://github.com/google-gemini/gemini-cli",
+    trustTier: 2,
+    enabled: true,
+    adapter: { type: "github_repository", repository: "google-gemini/gemini-cli", provider: "Google", projectName: "Gemini CLI", kind: "agent", surface: "terminal", description: "Open-source Gemini agent that works inside the terminal.", tags: ["coding-agent", "terminal", "local"] },
+  },
+  {
+    id: "src_aider_repository",
+    slug: "aider-repository",
+    name: "Aider repository activity",
+    homepageUrl: "https://github.com/Aider-AI/aider",
+    trustTier: 2,
+    enabled: true,
+    adapter: { type: "github_repository", repository: "Aider-AI/aider", provider: "Aider", projectName: "Aider", kind: "agent", surface: "terminal", description: "Open-source pair programmer built around a terminal workflow.", tags: ["coding-agent", "terminal", "local", "open-source"] },
+  },
+  {
+    id: "src_cline_repository",
+    slug: "cline-repository",
+    name: "Cline repository activity",
+    homepageUrl: "https://github.com/cline/cline",
+    trustTier: 2,
+    enabled: true,
+    adapter: { type: "github_repository", repository: "cline/cline", provider: "Cline", projectName: "Cline", kind: "agent", surface: "desktop", description: "Agentic coding extension that runs inside desktop editors.", tags: ["coding-agent", "desktop", "editor"] },
+  },
+  {
+    id: "src_roo_code_repository",
+    slug: "roo-code-repository",
+    name: "Roo Code repository activity",
+    homepageUrl: "https://github.com/RooCodeInc/Roo-Code",
+    trustTier: 2,
+    enabled: true,
+    adapter: { type: "github_repository", repository: "RooCodeInc/Roo-Code", provider: "Roo Code", projectName: "Roo Code", kind: "agent", surface: "desktop", description: "Open-source agentic coding extension for desktop editors.", tags: ["coding-agent", "desktop", "editor", "open-source"] },
+  },
+  {
+    id: "src_openhands_repository",
+    slug: "openhands-repository",
+    name: "OpenHands repository activity",
+    homepageUrl: "https://github.com/OpenHands/OpenHands",
+    trustTier: 2,
+    enabled: true,
+    adapter: { type: "github_repository", repository: "OpenHands/OpenHands", provider: "OpenHands", projectName: "OpenHands", kind: "agent", surface: "browser", description: "Open coding-agent platform with local, self-hosted, and browser cloud surfaces.", tags: ["coding-agent", "browser", "cloud", "open-source"] },
+  },
+  {
+    id: "src_openai_skills_repository",
+    slug: "openai-skills-repository",
+    name: "OpenAI Skills repository activity",
+    homepageUrl: "https://github.com/openai/skills",
+    trustTier: 2,
+    enabled: true,
+    adapter: { type: "github_repository", repository: "openai/skills", provider: "OpenAI", projectName: "OpenAI Skills", kind: "skill", surface: "portable", description: "Reusable task instructions for coding and general-purpose agents.", tags: ["agent-skill", "portable", "open-source"] },
+  },
+  {
+    id: "src_anthropic_skills_repository",
+    slug: "anthropic-skills-repository",
+    name: "Anthropic Skills repository activity",
+    homepageUrl: "https://github.com/anthropics/skills",
+    trustTier: 2,
+    enabled: true,
+    adapter: { type: "github_repository", repository: "anthropics/skills", provider: "Anthropic", projectName: "Anthropic Skills", kind: "skill", surface: "portable", description: "Public skill examples and specifications for agent workflows.", tags: ["agent-skill", "portable", "open-source"] },
+  },
+  {
+    id: "src_huggingface_skills_repository",
+    slug: "huggingface-skills-repository",
+    name: "Hugging Face Skills repository activity",
+    homepageUrl: "https://github.com/huggingface/skills",
+    trustTier: 2,
+    enabled: true,
+    adapter: { type: "github_repository", repository: "huggingface/skills", provider: "Hugging Face", projectName: "Hugging Face Skills", kind: "skill", surface: "portable", description: "Portable agent skills for datasets, training, evaluation, and Hub workflows.", tags: ["agent-skill", "portable", "open-source"] },
+  },
+  {
+    id: "src_agent_skills_standard_repository",
+    slug: "agent-skills-standard-repository",
+    name: "Agent Skills standard activity",
+    homepageUrl: "https://github.com/agentskills/agentskills",
+    trustTier: 2,
+    enabled: true,
+    adapter: { type: "github_repository", repository: "agentskills/agentskills", provider: "Agent Skills", projectName: "Agent Skills standard", kind: "skill", surface: "portable", description: "Open format and documentation for packaging reusable agent capabilities.", tags: ["agent-skill", "portable", "standard", "open-source"] },
   },
 ];
 

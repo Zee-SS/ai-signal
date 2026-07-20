@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title id="title">AI Signal mark</title>
-  <rect width="64" height="64" rx="12" fill="#f8f9f5"/>
-  <path d="M14 42V22h8l10 20h-7l-2-5h-9l-2 5h2Zm2-11h5l-2.5-7L16 31Zm20 11V22h7v20h-7Zm11 0V22h3v20h-3Z" fill="#293021"/>
+  <title id="title">AI Signal</title>
+  <rect width="64" height="64" rx="15" fill="#effbeF"/>
+  <g fill="none" stroke="#13894b" stroke-width="5" stroke-linecap="round">
+    <path d="M17 32a15 15 0 0 1 15 15"/>
+    <path d="M17 18a29 29 0 0 1 29 29" opacity=".65"/>
+    <path d="M17 7a40 40 0 0 1 40 40" opacity=".3"/>
+  </g>
+  <circle cx="17" cy="47" r="6" fill="#52d77d"/>
 </svg>

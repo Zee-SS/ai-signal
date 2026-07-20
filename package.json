@@ -1,6 +1,6 @@
 {
   "name": "ai-signal",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -27,6 +27,7 @@
     "deploy:worker": "npm run deploy --workspace @ai-signal/worker"
   },
   "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "5.3.0",
     "@fontsource-variable/geist": "5.3.0",
     "@fontsource-variable/geist-mono": "5.3.0",
     "@phosphor-icons/react": "2.1.10",
@@ -38,8 +39,8 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.4",
     "@axe-core/playwright": "4.12.1",
+    "@biomejs/biome": "2.5.4",
     "@cloudflare/workers-types": "5.20260719.1",
     "@playwright/test": "1.61.1",
     "@tailwindcss/vite": "4.3.3",
