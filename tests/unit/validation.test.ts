@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import benchmarkSnapshots from "../../shared/data/benchmark-snapshots.json";
-import { benchmarkResultSchema, externalItemSchema, modelSchema } from "../../shared/schemas/domain";
+import codingModelSnapshot from "../../shared/data/coding-model-snapshot.json";
+import {
+  benchmarkResultSchema,
+  codingModelSignalSchema,
+  externalItemSchema,
+  modelSchema,
+} from "../../shared/schemas/domain";
 
 describe("external schemas", () => {
   it("accepts a minimal verified item", () => {
@@ -59,5 +65,17 @@ describe("external schemas", () => {
       "swe-bench-verified",
       "swe-rebench",
     ]));
+  });
+
+  it("keeps newly released models visible without inventing a comparable rank", () => {
+    const parsed = codingModelSignalSchema.array().parse(codingModelSnapshot);
+    const kimiK3 = parsed.find((entry) => entry.id === "kimi-k3");
+
+    expect(kimiK3?.comparisonStatus).toBe("awaiting-comparable-benchmark");
+    if (kimiK3?.comparisonStatus === "awaiting-comparable-benchmark") {
+      expect(kimiK3.qualityMetric).toBe("Awaiting SWE-rebench");
+      expect(kimiK3.contextLength).toBe(1_048_576);
+      expect(kimiK3.speedTokensPerSecond).toBeGreaterThan(0);
+    }
   });
 });

@@ -1,6 +1,6 @@
 import { ArrowSquareOut, Check, Clock, Lightning, Medal, PiggyBank } from "@phosphor-icons/react";
 import { formatCapeTownDate, formatCapeTownDateTime } from "@shared/lib/dates";
-import type { ApiItem, CodingModelSignal, DashboardResponse } from "@shared/schemas/domain";
+import type { ApiItem, DashboardResponse, RankedCodingModelSignal } from "@shared/schemas/domain";
 
 interface DailyPulseProps {
   data: DashboardResponse;
@@ -14,12 +14,18 @@ function latestAgentRelease(items: ApiItem[]): ApiItem | null {
     .sort((left, right) => right.publishedAt.localeCompare(left.publishedAt))[0] ?? null;
 }
 
-function bestValue(models: CodingModelSignal[]): CodingModelSignal | null {
+function bestValue(models: RankedCodingModelSignal[]): RankedCodingModelSignal | null {
   return [...models].sort((left, right) => (right.qualityScore / Math.max(right.costPerProblem, 0.01)) - (left.qualityScore / Math.max(left.costPerProblem, 0.01)))[0] ?? null;
 }
 
 export function DailyPulse({ data, lastVisitAt, onMarkSeen }: DailyPulseProps) {
-  const models = data.codingModels;
+  const models = data.codingModels.filter(
+    (model): model is RankedCodingModelSignal => model.comparisonStatus === "ranked",
+  );
+  const modelSnapshotDate = data.codingModels
+    .map((model) => model.snapshotDate)
+    .sort()
+    .reverse()[0] ?? null;
   const leader = [...models].sort((left, right) => left.qualityRank - right.qualityRank)[0] ?? null;
   const fastest = [...models].sort((left, right) => right.speedTokensPerSecond - left.speedTokensPerSecond)[0] ?? null;
   const value = bestValue(models);
@@ -90,7 +96,7 @@ export function DailyPulse({ data, lastVisitAt, onMarkSeen }: DailyPulseProps) {
       <p className="freshness-line">
         {data.meta.lastSuccessfulRefreshAt ? `Fetched ${formatCapeTownDateTime(data.meta.lastSuccessfulRefreshAt)}` : "No successful production refresh yet"}
         <span>·</span>
-        Model measurements verified {models[0] ? formatCapeTownDate(models[0].snapshotDate) : "not available"}
+        Model measurements verified {modelSnapshotDate ? formatCapeTownDate(modelSnapshotDate) : "not available"}
       </p>
     </section>
   );

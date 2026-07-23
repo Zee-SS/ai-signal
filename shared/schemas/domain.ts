@@ -136,10 +136,18 @@ export const eventSchema = z.object({
   status: z.enum(["confirmed", "predicted", "cancelled", "archived"]),
 });
 
-export const codingModelSignalSchema = z.object({
+const codingModelSignalBaseSchema = z.object({
   id: z.string().min(1),
   model: z.string().min(1),
   provider: z.string().min(1),
+  openWeight: z.boolean(),
+  nuance: z.string().min(1).max(220),
+  snapshotDate: z.iso.date(),
+  importMethod: z.literal("manual"),
+});
+
+export const rankedCodingModelSignalSchema = codingModelSignalBaseSchema.extend({
+  comparisonStatus: z.literal("ranked"),
   qualityRank: z.number().int().positive(),
   qualityScore: z.number().min(0).max(100),
   qualityMetric: z.literal("SWE-rebench resolved"),
@@ -149,11 +157,26 @@ export const codingModelSignalSchema = z.object({
   speedVariant: z.string().min(1),
   speedSourceUrl: z.url(),
   costPerProblem: z.number().nonnegative(),
-  openWeight: z.boolean(),
-  nuance: z.string().min(1).max(220),
-  snapshotDate: z.iso.date(),
-  importMethod: z.literal("manual"),
 });
+
+export const awaitingCodingModelSignalSchema = codingModelSignalBaseSchema.extend({
+  comparisonStatus: z.literal("awaiting-comparable-benchmark"),
+  releaseDate: z.iso.date(),
+  contextLength: z.number().int().positive(),
+  inputPricePerMillion: z.number().nonnegative(),
+  outputPricePerMillion: z.number().nonnegative(),
+  qualityMetric: z.literal("Awaiting SWE-rebench"),
+  qualitySourceUrl: z.url(),
+  speedTokensPerSecond: z.number().positive(),
+  speedVariant: z.string().min(1),
+  speedSourceUrl: z.url(),
+  officialSourceUrl: z.url(),
+});
+
+export const codingModelSignalSchema = z.discriminatedUnion("comparisonStatus", [
+  rankedCodingModelSignalSchema,
+  awaitingCodingModelSignalSchema,
+]);
 
 export const codingLandscapeEntrySchema = z.object({
   id: z.string().min(1),
@@ -234,6 +257,8 @@ export type BenchmarkResult = z.infer<typeof benchmarkResultSchema>;
 export type BenchmarkDefinition = z.infer<typeof benchmarkDefinitionSchema>;
 export type ImportantEvent = z.infer<typeof eventSchema>;
 export type CodingModelSignal = z.infer<typeof codingModelSignalSchema>;
+export type RankedCodingModelSignal = z.infer<typeof rankedCodingModelSignalSchema>;
+export type AwaitingCodingModelSignal = z.infer<typeof awaitingCodingModelSignalSchema>;
 export type CodingLandscapeEntry = z.infer<typeof codingLandscapeEntrySchema>;
 export type TrendTopic = z.infer<typeof trendTopicSchema>;
 export type SyncRun = z.infer<typeof syncRunSchema>;

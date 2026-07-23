@@ -48,6 +48,17 @@ test("switches model graph views and reveals a model trade-off", async ({ page }
   await expect(page.getByRole("complementary").getByText("164 tok/s", { exact: true })).toBeVisible();
 });
 
+test("shows a newly released model without assigning a benchmark rank", async ({ page }) => {
+  const watch = page.locator(".model-detail--watch");
+  await expect(watch.getByText("Fixture newly released model", { exact: true })).toBeVisible();
+  await expect(watch.getByText(/awaiting a comparable SWE-rebench run/i)).toBeVisible();
+  await expect(watch.getByText("35.2 tok/s", { exact: true })).toBeVisible();
+  await expect(watch.getByRole("link", { name: /Official model details/ })).toHaveAttribute(
+    "href",
+    "https://example.com/official-awaiting",
+  );
+});
+
 test("separates local and browser agents and shows skill momentum", async ({ page }) => {
   await expect(page.getByText("Terminal + PC", { exact: true })).toBeAttached();
   await expect(page.getByText("Browser + cloud", { exact: true })).toBeAttached();

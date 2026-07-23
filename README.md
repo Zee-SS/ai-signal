@@ -107,11 +107,12 @@ The model map intentionally keeps evidence types separate:
 - **Coding quality:** official SWE-rebench resolved rate within one named leaderboard window and track.
 - **Output speed:** Artificial Analysis output tokens per second, including its provider/variant description.
 - **Run cost:** cost per SWE-rebench problem from the same quality leaderboard record.
+- **New model watch:** official release, context, and API details plus separately labelled independent speed data. A new model is not plotted or ranked until the named SWE-rebench window has a comparable result.
 - **Nuance:** a short deterministic comparison of those visible measurements.
 
 Quality and speed are different tests, and some effort variants differ. The page discloses that caveat beside the chart and links both sources. It does not average the measurements into a fake universal score.
 
-`shared/data/coding-model-snapshot.json` is a manually verified source snapshot because the quality and speed providers do not expose one shared stable API. Every record includes the exact variant, snapshot date, import method, and original URLs. Update it only after verifying every value at both original sources.
+`shared/data/coding-model-snapshot.json` is a manually verified source snapshot because the quality and speed providers do not expose one shared stable API. Ranked records include the exact variant, snapshot date, import method, and original URLs. Newly released watch records retain official specifications and independent measurements but remain explicitly unranked until comparable coding-quality evidence exists. Update a record only after verifying every value at its original source.
 
 ### Agent and skill momentum
 
@@ -353,6 +354,7 @@ Draft releases are always ignored; prereleases follow `INCLUDE_PRERELEASES`.
 6. Run schema, browser, and visual checks.
 
 Do not combine tracks or copy a provider marketing benchmark into the SWE-rebench axis.
+If a significant new coding model has official specifications and independent measurements but no comparable SWE-rebench result, add it as `awaiting-comparable-benchmark`. Never assign it a placeholder score or rank.
 
 ### Add a benchmark snapshot
 
@@ -394,6 +396,7 @@ Expired confirmed and predicted dates are archived automatically.
 
 - One D1 database per environment; no KV, Queue, Vectorize, Durable Object, or paid model API is required.
 - The three-hour cron produces eight scheduled invocations per day.
+- Low-trust Hacker News sampling is capped so primary sources and repository checks remain within the Workers Free 50-subrequest limit.
 - Repository adapters add a small number of GitHub requests; a token is recommended if sources expand substantially.
 - Feed entries remain capped and old items are pruned after 180 days.
 - Public responses use edge caching to reduce D1 reads.

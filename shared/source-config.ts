@@ -368,7 +368,7 @@ export const SOURCE_CONFIG: SourceDefinition[] = [
         "open weights",
         "model release",
       ],
-      storySample: 80,
+      storySample: 10,
     },
   },
   {

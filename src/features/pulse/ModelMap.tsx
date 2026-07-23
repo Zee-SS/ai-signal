@@ -1,5 +1,10 @@
 import { ArrowSquareOut, Info, LockOpen } from "@phosphor-icons/react";
-import type { CodingModelSignal } from "@shared/schemas/domain";
+import { formatCapeTownDate } from "@shared/lib/dates";
+import type {
+  AwaitingCodingModelSignal,
+  CodingModelSignal,
+  RankedCodingModelSignal,
+} from "@shared/schemas/domain";
 import { useMemo, useState } from "react";
 import { readStorage, STORAGE_KEYS, writeStorage } from "@/lib/storage";
 
@@ -15,19 +20,26 @@ function scale(value: number, minimum: number, maximum: number, start: number, e
 }
 
 export function ModelMap({ models }: { models: CodingModelSignal[] }) {
+  const rankedModels = models.filter(
+    (model): model is RankedCodingModelSignal => model.comparisonStatus === "ranked",
+  );
+  const awaitingModels = models.filter(
+    (model): model is AwaitingCodingModelSignal =>
+      model.comparisonStatus === "awaiting-comparable-benchmark",
+  );
   const [metric, setMetricState] = useState<Metric>(() => readStorage<Metric>(STORAGE_KEYS.modelMetric, "speed"));
-  const [selectedId, setSelectedId] = useState<string | null>(models[0]?.id ?? null);
-  const selected = models.find((model) => model.id === selectedId) ?? models[0] ?? null;
+  const [selectedId, setSelectedId] = useState<string | null>(rankedModels[0]?.id ?? null);
+  const selected = rankedModels.find((model) => model.id === selectedId) ?? rankedModels[0] ?? null;
   const bounds = useMemo(() => {
-    const xValues = models.map((model) => metric === "speed" ? model.speedTokensPerSecond : model.costPerProblem);
-    const yValues = models.map((model) => model.qualityScore);
+    const xValues = rankedModels.map((model) => metric === "speed" ? model.speedTokensPerSecond : model.costPerProblem);
+    const yValues = rankedModels.map((model) => model.qualityScore);
     return {
       xMin: Math.min(...xValues, 0),
       xMax: Math.max(...xValues, 1),
       yMin: Math.floor(Math.min(...yValues, 50) - 1),
       yMax: Math.ceil(Math.max(...yValues, 65) + 1),
     };
-  }, [metric, models]);
+  }, [metric, rankedModels]);
 
   const setMetric = (next: Metric): void => {
     setMetricState(next);
@@ -50,7 +62,7 @@ export function ModelMap({ models }: { models: CodingModelSignal[] }) {
         </fieldset>
       </div>
 
-      {models.length ? (
+      {rankedModels.length ? (
         <div className="model-map-shell">
           <div className="model-map__canvas">
             <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-labelledby="model-map-title model-map-description">
@@ -66,7 +78,7 @@ export function ModelMap({ models }: { models: CodingModelSignal[] }) {
               <text x={(MARGIN.left + WIDTH - MARGIN.right) / 2} y={HEIGHT - 16} textAnchor="middle" className="chart-label">
                 {metric === "speed" ? "Output tokens / second · faster →" : "← lower cost · US dollars / benchmark problem"}
               </text>
-              {models.map((model) => {
+              {rankedModels.map((model) => {
                 const value = metric === "speed" ? model.speedTokensPerSecond : model.costPerProblem;
                 const x = scale(value, bounds.xMin, bounds.xMax, MARGIN.left + 25, WIDTH - MARGIN.right - 25);
                 const y = scale(model.qualityScore, bounds.yMin, bounds.yMax, HEIGHT - MARGIN.bottom - 20, MARGIN.top + 20);
@@ -89,7 +101,7 @@ export function ModelMap({ models }: { models: CodingModelSignal[] }) {
           </div>
 
           <div className="model-map__mobile">
-            {models.map((model) => (
+            {rankedModels.map((model) => (
               <button key={model.id} type="button" className="model-rank-row" data-active={model.id === selected?.id ? "true" : "false"} aria-label={`${model.model}: ${model.qualityScore}% resolved, ${model.speedTokensPerSecond} output tokens per second, $${model.costPerProblem.toFixed(2)} per problem`} onClick={() => choose(model.id)}>
                 <span className="model-rank-row__rank">{model.qualityRank}</span>
                 <span><strong>{model.model}</strong><small>{model.provider}</small></span>
@@ -120,7 +132,29 @@ export function ModelMap({ models }: { models: CodingModelSignal[] }) {
         </div>
       ) : <p className="compact-empty">No verified coding-model snapshot is available.</p>}
 
-      <p className="method-note"><Info aria-hidden="true" /> Quality and speed come from different tests and some effort variants differ. Use the map to see trade-offs, not as a single objective ranking.</p>
+      {awaitingModels.map((model) => (
+        <aside className="model-detail model-detail--watch" key={model.id}>
+          <div className="model-detail__title">
+            <span className="model-rank model-rank--watch">New</span>
+            <div>
+              <strong>{model.model}</strong>
+              <span>{model.provider} · awaiting a comparable SWE-rebench run</span>
+            </div>
+          </div>
+          <p>{model.nuance}</p>
+          <dl>
+            <div><dt>Released</dt><dd>{formatCapeTownDate(model.releaseDate)}</dd></div>
+            <div><dt>Context</dt><dd>{Math.round(model.contextLength / 1_048_576)}M tokens</dd></div>
+            <div><dt>AA output</dt><dd>{model.speedTokensPerSecond} tok/s</dd></div>
+          </dl>
+          <div className="model-detail__sources">
+            <a className="external-link" href={model.officialSourceUrl} target="_blank" rel="noopener noreferrer">Official model details <ArrowSquareOut aria-hidden="true" /></a>
+            <a className="external-link" href={model.speedSourceUrl} target="_blank" rel="noopener noreferrer">Independent measurements <ArrowSquareOut aria-hidden="true" /></a>
+          </div>
+        </aside>
+      ))}
+
+      <p className="method-note"><Info aria-hidden="true" /> Ranked points share one SWE-rebench window. Newly released models stay explicitly unranked until a comparable result exists; speed remains a separate Artificial Analysis measurement.</p>
     </section>
   );
 }

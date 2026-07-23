@@ -439,7 +439,7 @@ export async function readDashboard(db: D1Database, environment: DashboardRespon
       staleReason,
       environment,
       fixture: false,
-      version: "1.1.0",
+      version: "1.2.0",
       timezone: "Africa/Johannesburg",
       cache: API_CACHE,
     },

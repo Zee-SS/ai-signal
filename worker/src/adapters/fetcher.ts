@@ -36,7 +36,8 @@ export async function fetchWithPolicy(
 
       if (response.ok) return response;
       if (!RETRYABLE_STATUS.has(response.status) || attempt === retries) {
-        throw new Error(`Source returned HTTP ${response.status}`);
+        lastError = new Error(`Source returned HTTP ${response.status}`);
+        break;
       }
 
       const retryAfter = Number(response.headers.get("Retry-After"));
