@@ -27,7 +27,7 @@
   --color-focus-soft: oklch(0.89 0.09 145 / 0.75);
 
   --color-success: oklch(0.43 0.13 145);
-  --color-warning: oklch(0.55 0.12 80);
+  --color-warning: oklch(0.53 0.12 80);
   --color-warning-tint: oklch(0.965 0.042 83);
   --color-error: oklch(0.52 0.18 27);
   --color-error-tint: oklch(0.958 0.032 27);
